@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@900&display=swap');
+
+body{
+    font-family: 'Roboto', sans-serif;
+}
+
+.welcomeTitle {
+    color: #ebebeb;
+    font-weight: 900;
+    font-family: 'Roboto Slab', serif;
+
+}
+
+.welcomeBackground {
+    background-image: url(https://images.pexels.com/photos/1907784/pexels-photo-1907784.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.headerMainPage {
+    width: 80vw;
+    height: 35vh;
+    margin: auto;
+    border-radius: 4px;
+    background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Books_HD_%288314929977%29.jpg/1280px-Books_HD_%288314929977%29.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.headerLogo {
+    width: 20vw;
+    top: 10%;
+    left: 40%;
+    right: 50%;
+}
+
+.cartBookCover {
+    width: 10vw;
+    min-width: 7rem;
+}
+
+.decreaseQntCart {
+    border-radius: 15px 0 0 15px;
+    padding-bottom: 12px;
+    padding-left: 10px;
+    height: 3rem;
+}
+
+.increaseQntCart {
+    border-radius: 0 15px 15px 0;
+    height: 3rem;
+}
