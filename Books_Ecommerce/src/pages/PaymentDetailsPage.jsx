@@ -1,28 +1,62 @@
-import { Navbar, Container } from "react-bootstrap"
 import ButtonMui from "@mui/material/Button"
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { Container } from "react-bootstrap"
 import { Typography, Grid, TextField } from "@mui/material"
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
 import { useDispatch } from "react-redux"
 import { setOrderDetails } from "../reducers/orderDetailsSlice"
+import "react-datepicker/dist/react-datepicker.css"
+
 
 export default function PaymentDetailsPage() {
 
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
-    const orderDetails = useSelector(state => state.orderDetails)
-    console.log(orderDetails)
+    const [address, setAddress] = useState("")
+    const [city, setCity] = useState("")
+    const [province, setProvince] = useState("")
+    const [zip, setZip] = useState("")
+    const [country, setCountry] = useState("")
 
-    const handleNext = () => {
+    const [cardNumber, setCardNumber] = useState("")
+    const [cvv, setCvv] = useState("")
+    const [expiryDate, setExpiryDate] = useState(null)
+
+    const handleExpiryDateChange = (date) => {
+        setExpiryDate(date)
+    }
+
+
+    const handleCardNumberChange = (e) => {
+        const input = e
+        const cleanedInput = input.replace(/\D/g, "")
+        setCardNumber(cleanedInput)
+    }
+
+    const handleCvvChange = (e) => {
+        const input = e
+        const cleanedInput = input.replace(/\D/g, "")
+        setCvv(cleanedInput)
+    }
+
+
+    const orderDetails = useSelector(state => state.orderDetails)
+
+    const handleSubmit = () => {
         if (!orderDetails.paymentAddress) {
             dispatch(setOrderDetails({
                 orderPaymentAddress: {
-                    address: document.getElementById("address").value,
-                    city: document.getElementById("city").value,
-                    province: document.getElementById("province").value,
-                    zip: document.getElementById("zip").value,
-                    country: document.getElementById("country").value,
+                    address,
+                    city,
+                    province,
+                    zip,
+                    country,
                 }
             }))
             navigate("/reviewOrderPage")
@@ -34,10 +68,6 @@ export default function PaymentDetailsPage() {
 
     return (
         <>
-            <Navbar className="bg-dark text-white">
-                <h1 className="fw-bold my-2 ms-3">The Book Club</h1>
-            </Navbar>
-
             <Container className="checkoutContainers">
                 <div className="mt-4 d-flex justify-content-between align-items-center">
                     <h1>Checkout</h1>
@@ -50,168 +80,187 @@ export default function PaymentDetailsPage() {
                     </div>
                 </div>
 
-                <div className="my-2 d-flex align-items-center">
-                    <span className="paymentPhaseCircle rounded-circle me-2 border border-primary bg-primary">
-                        <svg
-                            width={8}
-                            fill="white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 448 512">
-                            <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
-                        </svg>
-                    </span>
-                    <p className="m-0 p-0 text-nowrap">
-                        Shipping details
-                    </p>
-                    <span className="ms-2 text-nowrap">
-                        --
-                    </span>
-                    <span className="paymentPhaseCircle rounded-circle border border-primary mx-2 bg-primary text-light">
-                        2
-                    </span>
-                    <p className="m-0 p-0 fw-bold text-nowrap">
-                        Payment details
-                    </p>
-                    <span className="ms-2 text-nowrap">
-                        --
-                    </span>
-                    <span className="paymentPhaseCircle rounded-circle mx-2 border bg-light ">
-                        3
-                    </span>
-                    <p className="m-0 p-0 text-nowrap">
-                        Review your order
-                    </p>
+                <div className="my-3 d-flex flex-wrap">
+                    <div className="d-flex align-items-center pb-2">
+                        <span className="paymentPhaseCircle rounded-circle me-2 border border-primary bg-primary">
+                            <svg
+                                width={8}
+                                fill="white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 448 512">
+                                <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
+                            </svg>
+                        </span>
+                        <p className="m-0 p-0 text-nowrap">
+                            Shipping details
+                        </p>
+                        <span className="ms-2 text-nowrap">
+                            --
+                        </span>
+                    </div>
+                    <div className="d-flex align-items-center pb-2">
+                        <span className="paymentPhaseCircle rounded-circle border border-primary mx-2 bg-primary text-light">
+                            2
+                        </span>
+                        <p className="m-0 p-0 fw-bold text-nowrap">
+                            Payment details
+                        </p>
+                        <span className="ms-2 text-nowrap">
+                            --
+                        </span>
+                    </div>
+                    <div className="d-flex align-items-center pb-2">
+                        <span className="paymentPhaseCircle rounded-circle me-2 border bg-light ">
+                            3
+                        </span>
+                        <p className="m-0 p-0 text-nowrap">
+                            Review your order
+                        </p>
+                    </div>
                 </div>
                 <Typography
                     variant="h6"
                     className="my-4">
                     Payment method
                 </Typography>
-                <Grid container spacing={5}>
-                    <Grid item xs={6}>
-                        <TextField
-                            required
-                            id="cardName"
-                            name="cardName"
-                            label="Card owner name"
-                            fullWidth
-                            autoComplete="cardName"
-                            variant="filled"
-                            size="small"
-                        />
-                    </Grid>
-                    <Grid item xs={6}>
-                        <TextField
-                            required
-                            id="cardNumber"
-                            name="cardNumber"
-                            label="Card number"
-                            fullWidth
-                            autoComplete="cardNumber"
-                            variant="filled"
-                            size="small"
-                        />
-                    </Grid>
-                    <Grid item xs={6}>
-                        <TextField
-                            required
-                            id="expirationDate"
-                            name="expirationDate"
-                            label="Expiration date"
-                            fullWidth
-                            autoComplete="expirationDate"
-                            variant="filled"
-                            size="small"
-                        />
-                    </Grid>
-                    <Grid item xs={6}>
-                        <TextField
-                            required
-                            id="cvv"
-                            name="cvv"
-                            label="CVV"
-                            helperText="Last three digits on signature strip"
-                            fullWidth
-                            autoComplete="cvv"
-                            variant="filled"
-                            size="small"
-                        />
-                    </Grid>
-                </Grid>
-
-                {!orderDetails.paymentAddress &&
-                    <>
-                        <Grid container spacing={4}>
-                            <Typography
-                                variant="h6"
-                                className="mt-5 pt-2 ms-4 ps-2">
-                                Payment address
-                            </Typography>
-                            <Grid item xs={12}>
-                                <TextField
-                                    required
-                                    id="address"
-                                    name="address"
-                                    label="Address"
-                                    fullWidth
-                                    variant="filled"
-                                    size="small"
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    required
-                                    id="city"
-                                    name="city"
-                                    label="City"
-                                    fullWidth
-                                    variant="filled"
-                                    size="small"
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    required
-                                    id="province"
-                                    name="province"
-                                    label="Province"
-                                    fullWidth
-                                    variant="filled"
-                                    size="small"
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    required
-                                    id="zip"
-                                    name="zip"
-                                    label="Postal code"
-                                    fullWidth
-                                    variant="filled"
-                                    size="small"
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    required
-                                    id="country"
-                                    name="country"
-                                    label="Country"
-                                    fullWidth
-                                    variant="filled"
-                                    size="small"
-                                />
-                            </Grid>
+                <form onSubmit={() => handleSubmit()}>
+                    <Grid container spacing={5}>
+                        <Grid item xs={6}>
+                            <TextField
+                                required
+                                id="cardName"
+                                name="cardName"
+                                label="Card owner name"
+                                fullWidth
+                                autoComplete="cardName"
+                                variant="filled"
+                            />
                         </Grid>
-                    </>
-                }
-                <ButtonMui
-                    onClick={() => handleNext()}
-                    variant="contained"
-                    className="my-5">
-                    Next
-                </ButtonMui>
+                        <Grid item xs={6}>
+                            <TextField
+                                onChange={(e) => handleCardNumberChange(e.target.value)}
+                                required
+                                id="cardNumber"
+                                name="cardNumber"
+                                label="Card number"
+                                inputProps={{ inputMode: 'numeric', maxLength: 16, minLength: 16 }}
+                                value={cardNumber}
+                                fullWidth
+                                autoComplete="cardNumber"
+                                variant="filled"
+                            />
+                        </Grid>
+                        <Grid item xs={6}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DemoContainer components={['DatePicker']}>
+                                    <DatePicker
+                                        onChange={(date) => handleExpiryDateChange(date)}
+                                        required
+                                        id="expiryDate"
+                                        label={'Expiry date*'}
+                                        views={["month", 'year']}
+                                        value={expiryDate}
 
+                                    />
+                                </DemoContainer>
+                            </LocalizationProvider>
+                        </Grid>
+                        <Grid item xs={6} className="mt-2">
+                            <TextField
+                                onChange={(e) => handleCvvChange(e.target.value)}
+                                required
+                                id="cvv"
+                                name="cvv"
+                                label="CVV"
+                                inputProps={{ inputMode: 'numeric', maxLength: 3, minLength: 3 }}
+                                value={cvv}
+                                helperText="Last three digits on signature strip"
+                                fullWidth
+                                autoComplete="cvv"
+                                variant="filled"
+
+                            />
+                        </Grid>
+                    </Grid>
+
+                    {!orderDetails.paymentAddress &&
+                        <>
+                            <Grid container spacing={4}>
+                                <Typography
+                                    variant="h6"
+                                    className="mt-5 pt-2 ms-4 ps-2">
+                                    Payment address
+                                </Typography>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        onChange={(e) => setAddress(e.target.value)}
+                                        required
+                                        id="address"
+                                        name="address"
+                                        label="Address"
+                                        fullWidth
+                                        variant="filled"
+                                        size="small"
+                                    />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        onChange={(e) => setCity(e.target.value)}
+                                        required
+                                        id="city"
+                                        name="city"
+                                        label="City"
+                                        fullWidth
+                                        variant="filled"
+                                        size="small"
+                                    />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        onChange={(e) => setProvince(e.target.value)}
+                                        required
+                                        id="province"
+                                        name="province"
+                                        label="Province"
+                                        fullWidth
+                                        variant="filled"
+                                        size="small"
+                                    />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        onChange={(e) => setZip(e.target.value)}
+                                        required
+                                        id="zip"
+                                        name="zip"
+                                        label="Postal code"
+                                        fullWidth
+                                        variant="filled"
+                                        size="small"
+                                    />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        onChange={(e) => setCountry(e.target.value)}
+                                        required
+                                        id="country"
+                                        name="country"
+                                        label="Country"
+                                        fullWidth
+                                        variant="filled"
+                                        size="small"
+                                    />
+                                </Grid>
+                            </Grid>
+                        </>
+                    }
+                    <ButtonMui
+                        type="submit"
+                        variant="contained"
+                        className="my-5">
+                        Next
+                    </ButtonMui>
+                </form>
             </Container>
         </>
     )

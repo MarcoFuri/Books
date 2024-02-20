@@ -1,4 +1,3 @@
-import Navbar from "react-bootstrap/Navbar"
 import ButtonMui from "@mui/material/Button"
 import { Col, Container, Row } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
@@ -18,13 +17,9 @@ export default function ReviewOrderPage() {
 
     return (
         <>
-            <Navbar className="bg-dark text-white">
-                <h1 className="fw-bold my-2 ms-3">The Book Club</h1>
-            </Navbar>
-
             <Container className="pb-5 checkoutContainers">
-                <div className="d-flex justify-content-between align-items-center">
-                    <h1 className="mt-4">Checkout</h1>
+                <div className="mt-4 d-flex justify-content-between align-items-center">
+                    <h1>Checkout</h1>
                     <div>
                         <ButtonMui
                             onClick={() => navigate("/paymentDetailsPage")}
@@ -34,43 +29,49 @@ export default function ReviewOrderPage() {
                     </div>
                 </div>
 
-                <div className="my-3 d-flex align-items-center">
-                    <span className="paymentPhaseCircle rounded-circle me-2 border border-primary bg-primary">
-                        <svg
-                            width={8}
-                            fill="white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 448 512">
-                            <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
-                        </svg>
-                    </span>
-                    <p className="m-0 p-0 text-nowrap">
-                        Shipping details
-                    </p>
-                    <span className="ms-2 text-nowrap">
-                        --
-                    </span>
-                    <span className="paymentPhaseCircle rounded-circle border border-primary mx-2 bg-primary text-light">
-                        <svg
-                            width={8}
-                            fill="white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 448 512">
-                            <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
-                        </svg>
-                    </span>
-                    <p className="m-0 p-0 text-nowrap">
-                        Payment details
-                    </p>
-                    <span className="ms-2 text-nowrap">
-                        --
-                    </span>
-                    <span className="paymentPhaseCircle rounded-circle border border-primary mx-2 bg-primary text-light">
-                        3
-                    </span>
-                    <p className="m-0 p-0 fw-bold text-nowrap">
-                        Review your order
-                    </p>
+                <div className="my-3 d-flex flex-wrap">
+                    <div className="d-flex align-items-center pb-2">
+                        <span className="paymentPhaseCircle rounded-circle me-2 border border-primary bg-primary">
+                            <svg
+                                width={8}
+                                fill="white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 448 512">
+                                <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
+                            </svg>
+                        </span>
+                        <p className="m-0 p-0 text-nowrap">
+                            Shipping details
+                        </p>
+                        <span className="ms-2 text-nowrap">
+                            --
+                        </span>
+                    </div>
+                    <div className="d-flex align-items-center pb-2">
+                        <span className="paymentPhaseCircle rounded-circle border border-primary mx-2 bg-primary text-light">
+                            <svg
+                                width={8}
+                                fill="white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 448 512">
+                                <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
+                            </svg>
+                        </span>
+                        <p className="m-0 p-0 text-nowrap">
+                            Payment details
+                        </p>
+                        <span className="ms-2 text-nowrap">
+                            --
+                        </span>
+                    </div>
+                    <div className="d-flex align-items-center pb-2">
+                        <span className="paymentPhaseCircle rounded-circle border border-primary me-2 bg-primary text-light">
+                            3
+                        </span>
+                        <p className="m-0 p-0 fw-bold text-nowrap">
+                            Review your order
+                        </p>
+                    </div>
                 </div>
                 <Row>
                     <p className="h3 mt-5 mb-4">Order summary</p>

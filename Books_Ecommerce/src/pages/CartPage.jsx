@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
-import { Container, Row, Col, Navbar } from "react-bootstrap"
+import { Container, Row, Col } from "react-bootstrap"
 import { removeItem, addItem } from "../reducers/modifyCartSlice"
 import { decreaseQuantity, increaseQuantity } from "../reducers/cartQuantitySlice"
 import ButtonMui from "@mui/material/Button"
@@ -26,18 +26,15 @@ function CartPage() {
 
     return (
         <>
-            <Navbar className="bg-dark text-white">
-                <h1 className="fw-bold my-2 ms-3">The Book Club</h1>
-            </Navbar>
-            <div className="m-3 d-flex justify-content-between">
-                <p className="yourCart fw-bold h4 mt-2">YOUR CART</p>
-                <ButtonMui
-                    onClick={() => navigate("/")}
-                    className="me-3">
-                    Go back
-                </ButtonMui>
-            </div>
-            <Container className="mt-3 pb-5">
+            <Container className="cartContainer my-4 pb-5">
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                    <p className="yourCart fw-bold h1 mt-2">YOUR CART</p>
+                    <div>
+                        <ButtonMui onClick={() => navigate("/")}>
+                            Go back
+                        </ButtonMui>
+                    </div>
+                </div>
                 <Row className="pb-5">
                     {myCart.map((book) =>
                         <Col key={book.id} className="bg-light m-2 p-4 rounded border border-2 col-12 d-flex justify-content-between position-relative">
@@ -90,8 +87,8 @@ function CartPage() {
                     <Button
                         onClick={() => navigate("/paymentShippingPage")}
                         variant="primary"
-                        className="my-2 px-3 bottom-0 btn-sm">
-                        GO TO PAYMENT
+                        className="my-3 px-3 bottom-0 btn-sm">
+                        GO TO CHECKOUT
                     </Button>
                 </Row>
             </Container>

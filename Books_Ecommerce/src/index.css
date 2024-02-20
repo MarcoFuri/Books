@@ -65,8 +65,9 @@ body{
 .cardContent {
     flex-grow: 1;
   }
-
+  
+.cartContainer, 
 .checkoutContainers {
     width: 90vw;
-    max-width: 50rem;
+    max-width: 60rem;
 }

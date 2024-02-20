@@ -32,6 +32,6 @@ const modifyCartSlice = createSlice({
     }
 })
 
-export const {removeItem} = modifyCartSlice.actions
-export const {addItem} = modifyCartSlice.actions
+export const { removeItem } = modifyCartSlice.actions
+export const { addItem } = modifyCartSlice.actions
 export default modifyCartSlice

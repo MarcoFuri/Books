@@ -5,7 +5,7 @@ import CardMedia from '@mui/material/CardMedia';
 import ButtonBts from 'react-bootstrap/Button';
 import ButtonMui from "@mui/material/Button"
 import Typography from '@mui/material/Typography';
-import { Nav, Navbar, Container, Form, Row, Col } from "react-bootstrap"
+import { Container, Form, Row, Col } from "react-bootstrap"
 import { useState, useEffect } from "react"
 import { replaceQueryValue } from '../reducers/querySearchSlice';
 import { addItem } from "../reducers/modifyCartSlice"
@@ -61,72 +61,53 @@ export default function MainPage() {
 
   return (
     <>
-      <Navbar className="bg-dark text-white">
-        <h1 className="fw-bold my-2 ms-3 text-nowrap">The Book Club</h1>
-        <Container>
-          <Nav className="me-auto">
-            {/* <Nav.Link className="text-white ms-4" href="#">Home</Nav.Link> */}
-            {/* <Nav.Link className="text-white ms-4" href="#">Link</Nav.Link> */}
-          </Nav>
-          <Form inline>
-            <Row>
-              <Col xs="auto">
-                <Form.Control
-                  onChange={(e) => setSearchInputValue(e.target.value)}
-                  type="text"
-                  placeholder="Search"
-                  className="border border-0" />
-              </Col>
-              <Col>
+      <Container className="">
+        <Form>
+          <Row>
+            <div className="d-flex align-items-center mt-3">
+              <Form.Control
+                onChange={(e) => setSearchInputValue(e.target.value)}
+                type="text"
+                placeholder="Search"
+                />
+              <div>
                 <ButtonBts
                   onClick={handleSearch}
                   variant="outline-secondary"
                   type="button">
                   Search
                 </ButtonBts>
-              </Col>
-            </Row>
-          </Form>
-        </Container>
-      </Navbar>
+              </div>
+            </div>
+          </Row>
+        </Form>
+      </Container>
+      <Container
+        fluid
+        className="position-fixed bottom-0 d-flex justify-content-between align-items-center border bg-light z-1">
 
-      {/* <Container fluid className="p-0 text-center mt-4 position-relative">
-      <div className="headerMainPage">
-       <img className="headerLogo position-absolute" src={booksLogo} alt="" />
-      </div>
-    </Container> */}
-      <div
-        className="position-sticky top-0 d-flex justify-content-between align-items-center border bg-light z-1">
-        
-          <ButtonMui
-            onClick={() => navigate("/cartPage/")}
-            className="m-3"
-            variant="contained">
-            <svg
-              className="me-2"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="#ebebeb"
-              width="22px"
-              viewBox="0 0 576 512">
-              <path d="M0 24C0 10.7 10.7 0 24 0H69.5c22 0 41.5 12.8 50.6 32h411c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3H170.7l5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H199.7c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5H24C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z" /></svg>
-            <p className="m-0 p-0 text-nowrap">
-              Go to Cart
-              <span className="border border-1 bg-dark rounded-pill p-1 px-2 ms-1">
-                {cartCounter}
-              </span>
-            </p>
-          </ButtonMui>
-          <div>
-            <ButtonMui className="me-1">
-              <p className="m-0 p-0">Your Profile</p>
-            </ButtonMui>
-          </div>
-         
-        
-      </div>
+        <ButtonMui
+          onClick={() => navigate("/cartPage/")}
+          className="m-3"
+          variant="contained">
+          <svg
+            className="me-2"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="#ebebeb"
+            width="22px"
+            viewBox="0 0 576 512">
+            <path d="M0 24C0 10.7 10.7 0 24 0H69.5c22 0 41.5 12.8 50.6 32h411c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3H170.7l5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H199.7c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5H24C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z" /></svg>
+          <p className="m-0 p-0 text-nowrap">
+            Go to Cart
+            <span className="border border-1 bg-dark rounded-pill p-1 px-2 ms-1">
+              {cartCounter}
+            </span>
+          </p>
+        </ButtonMui>
+      </Container>
 
-      <Container className="mt-1">
-        <Row className="justify-content-evenly">
+      <Container className="mt-1 pb-5">
+        <Row className="justify-content-evenly pb-4">
           {booksAvailable.map((book) =>
             <Col key={book.id} className="col-6 col-md-4 col-lg-3 my-3">
               <Card className="card">
@@ -138,9 +119,8 @@ export default function MainPage() {
                 <CardContent className="cardContent">
                   <Typography
                     gutterBottom
-                    variant="h5"
                     component="div">
-                    {book.title}
+                    <strong>{book.title}</strong>
                   </Typography>
                   <Typography
                     variant="body2"
