@@ -15,8 +15,7 @@ import { TextField } from '@mui/material';
 
 
 export default function MainPage() {
-  // localStorage.removeItem("usersCart")
-  // localStorage.removeItem("unmatchedCart")
+
   const booksAvailable = [
     { id: "id989283", title: "Harry Potter and the Philosopher's Stone", year: 1999, price: 11.9, author: "J.K.Rowling", cover: "https://www.lafeltrinelli.it/images/9788831003384_0_536_0_75.jpg" },
     { id: "id987364", title: "Harry Potter and the Chamber of Secrets", year: 2000, price: 11.9, author: "J.K.Rowling", cover: "https://bg.isbn.host4g.ru/images_isbn/9781408855669.jpg" },
@@ -42,8 +41,6 @@ export default function MainPage() {
 
   const [bookAdded, setBookAdded] = useState(false)
 
-  // RenderCart()
-
   const unmatchedCartStored = localStorage.getItem("unmatchedCart") ?
     JSON.parse(localStorage.getItem("unmatchedCart")) : []
 
@@ -57,15 +54,15 @@ export default function MainPage() {
 
   useEffect(() => {
     if (!loginStatus) {
-      dispatch(setCart(unmatchedCartStored))
       let unmatchedCartQuantity = 0
       unmatchedCartStored.forEach((el) => unmatchedCartQuantity += el.quantity)
+      dispatch(setCart(unmatchedCartStored))
       dispatch(setQuantityCart(unmatchedCartQuantity))
     } else {
       console.log(userLoggedCartStored)
-      dispatch(setCart(userLoggedCartStored.cart))
       let userLoggedCartQuantity = 0
       userLoggedCartStored.cart.forEach((el) => userLoggedCartQuantity += el.quantity)
+      dispatch(setCart(userLoggedCartStored.cart))
       dispatch(setQuantityCart(userLoggedCartQuantity))
     }
   }, [])
@@ -197,6 +194,7 @@ export default function MainPage() {
                   </Typography>
                   <Typography
                     className="fw-normal lh-sm mt-3"
+                    style={{fontSize:"0.9rem"}}
                   >
                     {book.price.toFixed(2)}$
                   </Typography>

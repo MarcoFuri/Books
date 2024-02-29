@@ -67,9 +67,23 @@ function LoginPage() {
             // if the userCart doesn't exist, create it and set it with all the unmatched cart items.
             const userLoggingInCartStored = usersCartStored.find((el) => el.email === users[indexUser].email) !== undefined ?
             usersCartStored.find((el) => el.email === users[indexUser].email) : { email: users[indexUser].email, cart: [] }
+            console.log("the user cart is this:", userLoggingInCartStored)
+
+            const userLoggingInCartStoredIndex = usersCartStored.findIndex((el) => el.email === users[indexUser].email)
+
 
             if (unmatchedCartStored) {
-                unmatchedCartStored.forEach((el) => userLoggingInCartStored.cart.push(el))
+                unmatchedCartStored.forEach((unmatchedBook) => {
+                    const bookAlreadyAdded = userLoggingInCartStored.cart.find( (userBook) => unmatchedBook.id === userBook.id )
+                    if (bookAlreadyAdded) {
+                        bookAlreadyAdded.quantity += 1
+                    } else {
+                        userLoggingInCartStored.cart.push(unmatchedBook)
+                    }
+                })
+                if (userLoggingInCartStoredIndex === -1) {
+                    usersCartStored.push(userLoggingInCartStored)
+                }
                 localStorage.setItem("usersCart", JSON.stringify(usersCartStored))
                 localStorage.removeItem("unmatchedCart")
             }

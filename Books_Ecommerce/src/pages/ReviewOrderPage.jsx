@@ -4,43 +4,31 @@ import { useNavigate } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
 import { clearCart } from "../reducers/modifyCartSlice"
 import { useState } from "react"
-import { setUserLogged } from "../reducers/userLoggedSlice"
-import { v4 as uuidv4 } from 'uuid';
-// import { setUserLogged } from "../reducers/userLoggedSlice"
-
+import { clearQuantityCart } from "../reducers/cartQuantitySlice"
 
 export default function ReviewOrderPage() {
-
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
-    const myCart = useSelector(state => state.cartItems.cart)
     const orderDetails = useSelector(state => state.orderDetails)
     const userLogged = useSelector(state => state.userLogged)
+
+    const usersCartStored = JSON.parse(localStorage.getItem("usersCart"))
+    const userLoggedCartStored = usersCartStored.find((el) => el.email === userLogged.email)
+    const userLoggedCartStoredIndex = usersCartStored.findIndex((el) => el.email === userLogged.email)
     
     const emailUserLogged = userLogged.email
-    // const existingUsers = JSON.parse(localStorage.getItem("existingUsers"))
-
-    // const [users, setUsers] = useState(existingUsers)
-
-    // const indexUserLogged = existingUsers.findIndex((el) => el.email === emailUserLogged)
-    // const userToUpdate = existingUsers[indexUserLogged]
-
-    const generateUniqueId = () => {
-        return uuidv4()
-    }
-
-    const orderId = generateUniqueId();
 
     const [orderConfirmed, setOrderConfirmed] = useState(false)
 
     const paymentAddress = orderDetails.orderPaymentAddress
-    const randomNumber = Math.floor(Math.random()*9999)
+    const progressiveOrderNumberStored = parseInt(localStorage.getItem("progressiveOrderNumber"))
+    console.log(progressiveOrderNumberStored)
 
     const newOrder = {
-        id: orderId,
+        orderNumber: "",
         email: emailUserLogged,
-        myCart,
+        userLoggedCartStored,
         orderDetails
     }
 
@@ -53,7 +41,17 @@ export default function ReviewOrderPage() {
     }
 
     const handleConfirmOrder = () => {
-        setOrderConfirmed(true)
+        if (progressiveOrderNumberStored) {
+            const progressiveOrderNumber = progressiveOrderNumberStored + 1
+            newOrder.orderNumber = progressiveOrderNumber
+            localStorage.setItem("progressiveOrderNumber", JSON.stringify(progressiveOrderNumber))
+            setOrderConfirmed(true)
+        } else {
+            newOrder.orderNumber = 1
+            localStorage.setItem("progressiveOrderNumber", "1")
+            setOrderConfirmed(true)
+        }
+       
         const ordersConfirmed = localStorage.getItem("ordersConfirmed")
         if (ordersConfirmed) {
             const arrayOrdersConfirmed = JSON.parse(ordersConfirmed)
@@ -62,16 +60,16 @@ export default function ReviewOrderPage() {
         } else {
             localStorage.setItem("ordersConfirmed", JSON.stringify([newOrder]))
         }
-        // userToUpdate.userOrders.push(newOrder)
-        // existingUsers.splice([indexUserLogged], 1, userToUpdate)
-        // const updatedUsers = JSON.stringify(existingUsers)
-        // localStorage.setItem("existingUsers", updatedUsers)
-        // dispatch(setUserLogged(userToUpdate))
+        
+        usersCartStored.splice(userLoggedCartStoredIndex, 1)
+        localStorage.setItem("usersCart", JSON.stringify(usersCartStored))
+        
         dispatch(clearCart())
         dispatch(clearQuantityCart())
+
         setTimeout(() => {
             navigate("/mainPage")
-        }, 8000)
+        }, 6000)
     }
 
     let totalExpenses = 0
@@ -137,7 +135,7 @@ export default function ReviewOrderPage() {
                 {orderConfirmed ?
                     <>
                         <p className="h2 mt-4">Thanks you for your purchase!</p>
-                        <p className="fw-normal h5">Your order is the number #{randomNumber}</p>
+                        <p className="fw-normal h5">Your order is on the way!</p>
                         <p className="fw-light mt-4">You will be redirected soon!</p>
                     </>
                     :
@@ -148,18 +146,18 @@ export default function ReviewOrderPage() {
                                 <p className="h5">Title</p>
                                 <p className="h5">Price</p>
                             </div>
-                            {myCart.map((book) =>
+                            {userLoggedCartStored.cart.map((book) =>
                                 <Col key={book.id} className="col-12 d-flex justify-content-between">
                                     <div>
                                         <p className="my-1">{book.title}</p>
                                         <p className="fw-light">{book.author}</p>
                                     </div>
-                                    <p className="my-1">{book.price.toFixed(2)}€ x {book.quantity}<span className="d-none">{totalExpenses += book.price * book.quantity}</span></p>
+                                    <p className="my-1">{book.price.toFixed(2)}$ x {book.quantity}<span className="d-none">{totalExpenses += book.price * book.quantity}</span></p>
                                 </Col>
                             )}
                             <div className="d-flex justify-content-between mt-4">
                                 <p className="h4 fw-bold">Total</p>
-                                <p className="h4 fw-bold">{totalExpenses.toFixed(2)}€</p>
+                                <p className="h4 fw-bold">{totalExpenses.toFixed(2)}$</p>
                             </div>
                         </Row>
                         <Row className="mt-5">
