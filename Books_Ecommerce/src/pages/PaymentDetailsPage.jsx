@@ -9,7 +9,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
 import { useDispatch } from "react-redux"
-import { setOrderDetails } from "../reducers/orderDetailsSlice"
+import { setUserCardDetails, setUserOrderDetails } from "../reducers/orderDetailsSlice"
 import "react-datepicker/dist/react-datepicker.css"
 
 
@@ -24,12 +24,22 @@ export default function PaymentDetailsPage() {
     const [zip, setZip] = useState("")
     const [country, setCountry] = useState("")
 
+    const [cardName, setCardName] = useState("")
     const [cardNumber, setCardNumber] = useState("")
     const [cvv, setCvv] = useState("")
     const [expiryDate, setExpiryDate] = useState(null)
+    const [expiryYearError, setExpiryYearError] = useState(false)
+
+    const today = new Date()
 
     const handleExpiryDateChange = (date) => {
         setExpiryDate(date)
+        console.log(date)
+        if (date.$y < today.getFullYear() || date.$y > today.getFullYear() + 10){
+            setExpiryYearError(true)
+        } else {
+            setExpiryDate(date)   
+        }
     }
 
 
@@ -49,8 +59,19 @@ export default function PaymentDetailsPage() {
     const orderDetails = useSelector(state => state.orderDetails)
 
     const handleSubmit = () => {
+
+        const cardDetails = {
+            cardName,
+            cardNumber,
+            cvv,
+            expiryDateMonth: (expiryDate.$M + 1),
+            expiryDateYear: (expiryDate.$y)
+        }
+
+        dispatch(setUserCardDetails({cardDetails}))
+
         if (!orderDetails.paymentAddress) {
-            dispatch(setOrderDetails({
+            dispatch(setUserOrderDetails({
                 orderPaymentAddress: {
                     address,
                     city,
@@ -65,7 +86,6 @@ export default function PaymentDetailsPage() {
         }
 
     }
-
     return (
         <>
             <Container className="checkoutContainers">
@@ -105,7 +125,7 @@ export default function PaymentDetailsPage() {
                         <p className="m-0 p-0 fw-bold text-nowrap">
                             Payment details
                         </p>
-                        <span className="ms-2 text-nowrap">
+                        <span className="mx-2 text-nowrap">
                             --
                         </span>
                     </div>
@@ -127,6 +147,7 @@ export default function PaymentDetailsPage() {
                     <Grid container spacing={5}>
                         <Grid item xs={6}>
                             <TextField
+                                onChange={(e) => setCardName(e.target.value)}
                                 required
                                 id="cardName"
                                 name="cardName"
@@ -160,7 +181,11 @@ export default function PaymentDetailsPage() {
                                         label={'Expiry date*'}
                                         views={["month", 'year']}
                                         value={expiryDate}
-
+                                        error={expiryYearError}
+                                        helperText={expiryYearError &&
+                                            "Year not valid" 
+                                        }
+                                        // let's handle this another time.
                                     />
                                 </DemoContainer>
                             </LocalizationProvider>

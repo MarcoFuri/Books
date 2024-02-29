@@ -3,8 +3,11 @@ import { useSelector, useDispatch } from "react-redux"
 import { Container, Row, Col } from "react-bootstrap"
 import { removeItem, addItem } from "../reducers/modifyCartSlice"
 import { decreaseQuantity, increaseQuantity } from "../reducers/cartQuantitySlice"
+import { useEffect, useState } from "react"
+import { clearQuantityCart } from "../reducers/cartQuantitySlice"
+import { clearCart } from '../reducers/modifyCartSlice';
+import { setCart } from "../reducers/modifyCartSlice"
 import ButtonMui from "@mui/material/Button"
-import Button from "react-bootstrap/Button"
 
 function CartPage() {
 
@@ -12,85 +15,199 @@ function CartPage() {
     const dispatch = useDispatch()
 
     const myCart = useSelector(state => state.cartItems)
-    let cartTotal = 0
+    const loginStatus = useSelector(state => state.loginStatus)
+    const userLogged = useSelector(state => state.userLogged)
+    const cartCounter = useSelector(state => state.cartQuantity)
+
+    const [cartWithProducts, setCartWithProducts] = useState(false)
+    const [checkoutError, setCheckoutError] = useState(false)
+    const [cartModified, setCartModified] = useState(false)
+
+    const unmatchedCartStored = localStorage.getItem("unmatchedCart") ?
+        JSON.parse(localStorage.getItem("unmatchedCart")) : []
+
+    const usersCartStored = localStorage.getItem("usersCart") ?
+        JSON.parse(localStorage.getItem("usersCart")) : []
+
+    const userLoggedCartStored = usersCartStored.find((el) => el.email === userLogged.email) !== undefined ?
+        usersCartStored.find((el) => el.email === userLogged.email) : { email: userLogged.email, cart: [] }
+
+    const userLoggedCartStoredIndex = usersCartStored.findIndex((el) => el.email === userLogged.email)
+
+    useEffect(() => {
+        if (!loginStatus) {
+          dispatch(setCart(unmatchedCartStored))
+        } else {
+          console.log(userLoggedCartStored)
+          dispatch(setCart(userLoggedCartStored.cart))
+        }
+      }, [])
+
+    useEffect(() => {
+        if (myCart.length > 0) {
+            setCartWithProducts(true)
+        } else {
+            setCartWithProducts(false)
+        }
+    }, [myCart])
+
+    useEffect(() => {
+        if (cartModified) {
+            if (!loginStatus) {
+                localStorage.setItem("unmatchedCart", JSON.stringify(myCart))
+            } else {
+                usersCartStored[userLoggedCartStoredIndex].cart = [...myCart]
+                localStorage.setItem("usersCart", JSON.stringify(usersCartStored))
+                setCartModified(false)
+            }
+        }
+    }, [cartModified])
+
+    let cartTotalPrice = 0
 
     const handleDecreaseQnt = (book) => {
         dispatch(removeItem(book))
         dispatch(decreaseQuantity())
+        setCartModified(true)
     }
 
     const handleIncreaseQnt = (book) => {
         dispatch(addItem(book))
         dispatch(increaseQuantity())
+        setCartModified(true)
+    }
+
+    const handleGoToCheckout = () => {
+        if (!cartWithProducts) {
+            setCheckoutError(true)
+        } else {
+            navigate("/paymentShippingPage")
+        }
+    }
+
+    const handleClearCart = () => {
+        if (cartCounter > 0) { // try to look for a way to change the label of the confirm
+            if (confirm("Are you sure? All the products in your cart will be removed")) {
+                dispatch(clearCart())
+                dispatch(clearQuantityCart())
+                localStorage.removeItem("usersCart")
+            }
+        }
     }
 
     return (
         <>
             <Container className="cartContainer my-4 pb-5">
                 <div className="d-flex justify-content-between align-items-center mb-2">
-                    <p className="yourCart fw-bold h1 mt-2">YOUR CART</p>
+                    <p className="yourCart fw-bold h2 mt-2">YOUR CART</p>
                     <div>
                         <ButtonMui onClick={() => navigate("/")}>
                             Go back
                         </ButtonMui>
                     </div>
                 </div>
-                <Row className="pb-5">
-                    {myCart.map((book) =>
-                        <Col key={book.id} className="bg-light m-2 p-4 rounded border border-2 col-12 d-flex justify-content-between position-relative">
-                            <div className="d-flex">
-                                <img
-                                    className="cartBookCover me-5"
-                                    src={book.cover}
-                                    alt="book cover" />
-                                <div>
-                                    <p className="fw-bold h5">{book.title}</p>
-                                    <p className="h6 fw-light">{book.author}</p>
-                                    <p className="h6 fw-light">Published in: <span className="fw-bold">{book.year}</span></p>
-                                    <p>x{book.quantity}</p>
+                {cartWithProducts ?
+                    <Row className="pb-5">
+                        {myCart.map((book, index) =>
+                            <Col key={index} className="bg-light m-2 p-3 rounded border border-2 col-12 d-flex justify-content-between position-relative">
+                                <div className="d-flex">
+                                    <img
+                                        className="me-4"
+                                        style={{ width: "5rem" }}
+                                        src={book.cover}
+                                        alt="book cover" />
+                                    <div>
+                                        <p className="fw-bold m-0 me-4">{book.title}</p>
+                                        <p className="fw-light lh-sm mb-2" style={{ fontSize: "0.85rem" }}>
+                                            {book.author}
+                                        </p>
+                                        <p className="h6 fw-light" style={{ fontSize: "0.85rem" }}>
+                                            Published in: <span className="fw-normal">{book.year}</span>
+                                        </p>
+                                        {/* <p>x{book.quantity}</p> */}
+                                    </div>
                                 </div>
-                            </div>
-                            <p className="h4 fw-bold">
-                                {book.price.toFixed(2)}€
-                                <span className="d-none">
-                                    {cartTotal += (book.price * book.quantity)}
-                                </span>
-                            </p>
-                            <div className="position-absolute d-flex end-0 bottom-0 m-3">
-                                <Button
-                                    onClick={() => handleDecreaseQnt(book)}
-                                    variant="outline-danger"
-                                    className="decreaseQntCart btn-sm">
-                                    _
-                                </Button>
-                                <p className="pt-2 mx-2">{book.quantity}</p>
-                                <Button
-                                    onClick={() => handleIncreaseQnt(book)}
-                                    variant="outline-success"
-                                    className="increaseQntCart btn-sm">
-                                    +
-                                </Button>
-                            </div>
+                                <p className="h5 fw-bold">
+                                    {/* {book.price.toFixed(2)}$ */}
+                                    <span className="d-none">
+                                        {cartTotalPrice += (book.price * book.quantity)}
+                                    </span>
+                                </p>
+                                <div className="position-absolute d-flex end-0 bottom-0 m-3">
+                                    <ButtonMui
+                                        onClick={() => handleDecreaseQnt(book)}
+                                        variant="outlined"
+                                        size="small"
+                                        color="error"
+                                        style={{ height: "1.5rem", minWidth: "1.5rem", width: "1.5rem", borderRadius: "15px 0 0 15px" }}
+                                    >
+                                        -
+                                    </ButtonMui>
+                                    <p
+                                        className="fw-bold border border-1 text-center"
+                                        style={{ width: "2.5rem", height: "1.5rem" }}
+                                    >{book.quantity}</p>
+                                    <ButtonMui
+                                        onClick={() => handleIncreaseQnt(book)}
+                                        variant="outlined"
+                                        size="small"
+                                        style={{ height: "1.5rem", minWidth: "1.5rem", width: "1.5rem", borderRadius: "0 15px 15px 0" }}
+                                    >
+                                        +
+                                    </ButtonMui>
+                                </div>
 
-                        </Col>
-                    )}
-                </Row>
+                            </Col>
+                        )}
+                    </Row>
+                    :
+                    <p className="h5 fw-normal">Still nothing in your cart!</p>
+                }
+                {checkoutError &&
+                    <p className="h6 fw-light p-2 border border-1 border-danger rounded">Nothing to checkout, add some books first!</p>
+                }
+
             </Container>
             <Container
                 fluid
                 className="position-fixed bottom-0 d-flex justify-content-between bg-light border px-5">
-                <Row className="me-5 my-2 p-2 bg-dark text-white rounded">
-                    <p className="m-0">Total</p>
-                    <p className="h4 m-0">{cartTotal.toFixed(2)}€</p>
+                <Row className="align-items-center">
+                    <Col className="me-1 my-2 p-1 px-3 bg-dark text-white rounded">
+                        <p className="m-0">Total</p>
+                        <p className="h4 m-0">{cartTotalPrice.toFixed(2)}$</p>
+                    </Col>
+                    <Col>
+                        <ButtonMui
+                            onClick={() => handleClearCart()}
+                            className="text-nowrap"
+                            variant="outlined"
+                            color="error"
+                            size="small"
+                        >
+                            Clear cart
+                        </ButtonMui>
+
+                    </Col>
                 </Row>
-                <Row>
-                    <Button
-                        onClick={() => navigate("/paymentShippingPage")}
-                        variant="primary"
-                        className="my-3 px-3 bottom-0 btn-sm">
-                        GO TO CHECKOUT
-                    </Button>
-                </Row>
+                {loginStatus ?
+                    <Row>
+                        <ButtonMui
+                            onClick={handleGoToCheckout}
+                            variant="contained"
+                            className="my-3">
+                            Go to checkout
+                        </ButtonMui>
+                    </Row>
+                    :
+                    <Row>
+                        <ButtonMui
+                            onClick={() => navigate("/loginPage")}
+                            variant="contained"
+                            className="my-3">
+                            Login to checkout
+                        </ButtonMui>
+                    </Row>
+                }
             </Container>
         </>
     )

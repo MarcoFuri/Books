@@ -28,10 +28,15 @@ const modifyCartSlice = createSlice({
                     state.splice(indexItem, 1)
                 }
             }
+        },
+        clearCart() {
+            return initialState
+        },
+        setCart(state, action) {
+            return action.payload
         }
     }
 })
 
-export const { removeItem } = modifyCartSlice.actions
-export const { addItem } = modifyCartSlice.actions
+export const { removeItem, addItem, clearCart, setCart } = modifyCartSlice.actions
 export default modifyCartSlice

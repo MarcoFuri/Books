@@ -11,9 +11,15 @@ const cartQuantitySlice = createSlice({
         },
         decreaseQuantity(state) {
             return state - 1
+        },
+        clearQuantityCart() {
+            return 0
+        }, 
+        setQuantityCart(state, action) {
+            return action.payload
         }
     }
 })
 
-export const { increaseQuantity, decreaseQuantity } = cartQuantitySlice.actions
+export const { increaseQuantity, decreaseQuantity, clearQuantityCart, setQuantityCart } = cartQuantitySlice.actions
 export default cartQuantitySlice

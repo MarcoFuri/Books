@@ -29,21 +29,19 @@ export default function SignUpPage() {
     }, [users])
 
     useEffect(() => {
-        if (existingUsers.length > 0) {
-            if (existingUsers.find((el) => el.email === email) !== undefined) {
-                setExistingUserError(true)
-            } else {
-                setExistingUserError(false)
-            }
-        }
-    }, [email, existingUsers])
+        setExistingUserError(false)
+    }, [email])
 
     const handleSignUp = () => {
 
-        setLoading(true)
-
         if (emailFormatError || existingUserError || password1Error || password2Error) {
             return
+        }
+
+        if (existingUsers.length > 0) {
+            if (existingUsers.find((el) => el.email === email) !== undefined) {
+                return setExistingUserError(true)
+            }
         }
 
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -57,12 +55,14 @@ export default function SignUpPage() {
             setTimeout(() => setPassword1Error(false), 4000)
         } else if (password1 !== password2) {
             setPassword2Error(true)
+            setTimeout(() => setPassword2Error(false), 4000)
         } else {
+            setLoading(true)
             const newUser = {
                 firstName,
                 lastName,
                 email,
-                password: password1
+                password: password1,
             }
             setUsers(
                 [
@@ -71,11 +71,11 @@ export default function SignUpPage() {
                 ]
             )
             
+            setTimeout(() => {
+                navigate("/loginPage")
+            }
+                , 2000)
         }
-        setTimeout(() => {
-            navigate("/loginPage")
-        }
-            , 2000)
     }
 
     return (
@@ -159,7 +159,7 @@ export default function SignUpPage() {
                                 id="password2"
                                 variant="filled"
                                 error={password2Error}
-                                helperText={password2Error && "Passwords doesn't match!"}
+                                helperText={password2Error && "Passwords don't match!"}
                             />
                         </Grid>
                     </Grid>

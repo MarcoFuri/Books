@@ -4,7 +4,7 @@ import { Container } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
 import { useDispatch } from "react-redux"
-import { setOrderDetails } from "../reducers/orderDetailsSlice"
+import { setUserOrderDetails } from "../reducers/orderDetailsSlice"
 
 function PaymentShippingPage() {
 
@@ -20,9 +20,11 @@ function PaymentShippingPage() {
     const [zip, setZip] = useState("")
     const [country, setCountry] = useState("")
 
+    const today = new Date()
+    const purchaseDate = today.getDate() + "/" + (today.getMonth() < 10 ? "0" + (today.getMonth() + 1) : today.getMonth() + 1) + "/" + today.getFullYear()
+
     const handleChangeCheckbox = () => {
         setCheckboxStatus(!checkboxStatus)
-        console.log(checkboxStatus)
     }
 
     const handleZipChange = (e) => {
@@ -31,10 +33,9 @@ function PaymentShippingPage() {
         setZip(cleanedInput)
     }
 
-
     const handleSubmit = () => {
         //check form?        
-        dispatch(setOrderDetails({
+        dispatch(setUserOrderDetails({
             firstName,
             lastName,
             address,
@@ -43,7 +44,8 @@ function PaymentShippingPage() {
             zip,
             country,
             paymentAddress: checkboxStatus,
-            orderPaymentAddress: checkboxStatus ? address : ""
+            orderPaymentAddress: checkboxStatus ? address : "",
+            purchaseDate,
         }))
         navigate("/paymentDetailsPage")
 
@@ -131,6 +133,7 @@ function PaymentShippingPage() {
                                 fullWidth
                                 variant="filled"
                                 size="small"
+                                helperText="Please enter your full address, including house number and street name (e.g., '123 Main Street')."
                             />
                         </Grid>
                         <Grid item xs={6}>

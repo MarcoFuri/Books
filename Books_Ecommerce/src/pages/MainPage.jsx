@@ -2,19 +2,21 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
-import ButtonBts from 'react-bootstrap/Button';
 import ButtonMui from "@mui/material/Button"
 import Typography from '@mui/material/Typography';
-import { Container, Form, Row, Col } from "react-bootstrap"
+import CartIcon from "../assets/cart.svg"
+import { Container, Row, Col } from "react-bootstrap"
 import { useState, useEffect } from "react"
-import { replaceQueryValue } from '../reducers/querySearchSlice';
-import { addItem } from "../reducers/modifyCartSlice"
-import { increaseQuantity } from "../reducers/cartQuantitySlice"
+import { addItem, setCart } from "../reducers/modifyCartSlice"
+import { increaseQuantity, setQuantityCart } from "../reducers/cartQuantitySlice"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
+import { TextField } from '@mui/material';
+
 
 export default function MainPage() {
-
+  // localStorage.removeItem("usersCart")
+  // localStorage.removeItem("unmatchedCart")
   const booksAvailable = [
     { id: "id989283", title: "Harry Potter and the Philosopher's Stone", year: 1999, price: 11.9, author: "J.K.Rowling", cover: "https://www.lafeltrinelli.it/images/9788831003384_0_536_0_75.jpg" },
     { id: "id987364", title: "Harry Potter and the Chamber of Secrets", year: 2000, price: 11.9, author: "J.K.Rowling", cover: "https://bg.isbn.host4g.ru/images_isbn/9781408855669.jpg" },
@@ -30,114 +32,181 @@ export default function MainPage() {
     { id: "id912738", title: "Harry Potter and the Order of the Phoenix", year: 2004, price: 12.5, author: "J.K.Rowling", cover: "https://m.media-amazon.com/images/I/813lOXWdSNL._AC_UF1000,1000_QL80_.jpg" },
   ]
 
-  const [searchInputValue, setSearchInputValue] = useState("")
-  const [searchQuery, setSearchQuery] = useState("")
-
-  // const query = useSelector(state => state.querySearch)
-  const myCart = useSelector(state => state.cartItems)
-  const cartCounter = useSelector(state => state.cartQuantity)
-
   const dispatch = useDispatch()
-
   const navigate = useNavigate()
 
+  const myCart = useSelector(state => state.cartItems)
+  const cartCounter = useSelector(state => state.cartQuantity)
+  const userLogged = useSelector(state => state.userLogged)
+  const loginStatus = useSelector(state => state.loginStatus)
+
+  const [bookAdded, setBookAdded] = useState(false)
+
+  // RenderCart()
+
+  const unmatchedCartStored = localStorage.getItem("unmatchedCart") ?
+    JSON.parse(localStorage.getItem("unmatchedCart")) : []
+
+  const usersCartStored = localStorage.getItem("usersCart") ?
+    JSON.parse(localStorage.getItem("usersCart")) : []
+
+  const userLoggedCartStored = usersCartStored.find((el) => el.email === userLogged.email) !== undefined ?
+    usersCartStored.find((el) => el.email === userLogged.email) : { email: userLogged.email, cart: [] }
+
+  const userLoggedCartStoredIndex = usersCartStored.findIndex((el) => el.email === userLogged.email)
+
   useEffect(() => {
-    console.log("your search input is:", searchInputValue)
-  }, [searchInputValue])
+    if (!loginStatus) {
+      dispatch(setCart(unmatchedCartStored))
+      let unmatchedCartQuantity = 0
+      unmatchedCartStored.forEach((el) => unmatchedCartQuantity += el.quantity)
+      dispatch(setQuantityCart(unmatchedCartQuantity))
+    } else {
+      console.log(userLoggedCartStored)
+      dispatch(setCart(userLoggedCartStored.cart))
+      let userLoggedCartQuantity = 0
+      userLoggedCartStored.cart.forEach((el) => userLoggedCartQuantity += el.quantity)
+      dispatch(setQuantityCart(userLoggedCartQuantity))
+    }
+  }, [])
+
+
+  useEffect(() => {
+    if (bookAdded) {
+      if (!loginStatus) {
+        localStorage.setItem("unmatchedCart", JSON.stringify(myCart))
+      } else {
+        if (userLoggedCartStoredIndex !== -1) {
+          usersCartStored[userLoggedCartStoredIndex].cart = [...myCart]
+          localStorage.setItem("usersCart", JSON.stringify(usersCartStored))
+          setBookAdded(false)
+        }
+      }
+    }
+  }, [dispatch, myCart, bookAdded])
 
   const handleAddToCart = (book) => {
     dispatch(increaseQuantity())
-    console.log("added to your cart!")
     dispatch(addItem(book))
-    console.log(myCart)
+    if (loginStatus && userLoggedCartStoredIndex === -1){
+      localStorage.setItem("usersCart", JSON.stringify([...usersCartStored, { ...userLoggedCartStored, cart: [book] }]))
+    } else {
+      setBookAdded(true)
+    }
   }
-
-  const handleSearch = () => {
-    setSearchQuery(searchInputValue)
-    dispatch(replaceQueryValue(searchQuery))
-    // fetch with seachQuery
-  }
-
 
   return (
     <>
-      <Container className="">
-        <Form>
-          <Row>
-            <div className="d-flex align-items-center mt-3">
-              <Form.Control
-                onChange={(e) => setSearchInputValue(e.target.value)}
-                type="text"
-                placeholder="Search"
-                />
-              <div>
-                <ButtonBts
-                  onClick={handleSearch}
-                  variant="outline-secondary"
-                  type="button">
-                  Search
-                </ButtonBts>
-              </div>
-            </div>
-          </Row>
-        </Form>
-      </Container>
       <Container
         fluid
-        className="position-fixed bottom-0 d-flex justify-content-between align-items-center border bg-light z-1">
+        className="position-sticky top-0 border bg-light z-1">
+        {loginStatus ?
 
-        <ButtonMui
-          onClick={() => navigate("/cartPage/")}
-          className="m-3"
-          variant="contained">
-          <svg
-            className="me-2"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="#ebebeb"
-            width="22px"
-            viewBox="0 0 576 512">
-            <path d="M0 24C0 10.7 10.7 0 24 0H69.5c22 0 41.5 12.8 50.6 32h411c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3H170.7l5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H199.7c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5H24C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z" /></svg>
-          <p className="m-0 p-0 text-nowrap">
-            Go to Cart
-            <span className="border border-1 bg-dark rounded-pill p-1 px-2 ms-1">
-              {cartCounter}
-            </span>
-          </p>
-        </ButtonMui>
+          <Row className="d-flex justify-content-between">
+            <p className="h6 fw-light m-2 pt-1 col-4">Logged in with: <br />
+              <span className="h6 fw-normal"> {userLogged.email}</span>
+            </p>
+            <ButtonMui
+              onClick={() => navigate("/cartPage/")}
+              className="mx-4 my-3"
+              variant="contained"
+              size="small"
+              style={{ padding: "6px", width: "9rem" }}
+            >
+              <img
+                src={CartIcon}
+                alt="cart icon"
+                style={{ width: "14px" }}
+                className="mx-1"
+              />
+              <p className="m-0 text-nowrap">
+                Go to Cart
+                <span className="border border-1 bg-dark rounded-pill p-1 px-2 ms-1">
+                  {cartCounter}
+                </span>
+              </p>
+            </ButtonMui>
+          </Row>
+          :
+          <Row className="justify-content-end">
+            <ButtonMui
+              onClick={() => navigate("/cartPage/")}
+              className="mx-4 my-3"
+              variant="contained"
+              size="small"
+              style={{ padding: "6px", width: "9rem" }}
+            >
+              <img
+                src={CartIcon}
+                alt="cart icon"
+                style={{ width: "14px" }}
+                className="mx-1"
+              />
+              <p className="m-0 text-nowrap">
+                Go to Cart
+                <span className="border border-1 bg-dark rounded-pill p-1 px-2 ms-1">
+                  {cartCounter}
+                </span>
+              </p>
+            </ButtonMui>
+          </Row>
+        }
+      </Container>
+      <Container>
+
+        <div className="d-flex align-items-center mt-3">
+          <TextField
+            // onChange={(e) => setSearchInputValue(e.target.value)}
+            placeholder="Search"
+            size="small"
+            fullWidth
+          />
+          <ButtonMui
+            // onClick={handleSearch}
+            // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            variant="outlined"
+            type="button"
+            className="ms-1">
+            Search
+          </ButtonMui>
+        </div>
       </Container>
 
-      <Container className="mt-1 pb-5">
+      <Container className="mt-1">
         <Row className="justify-content-evenly pb-4">
           {booksAvailable.map((book) =>
             <Col key={book.id} className="col-6 col-md-4 col-lg-3 my-3">
               <Card className="card">
                 <CardMedia
-                  sx={{ height: 250, width: 150, margin: "auto" }}
+                  sx={{ height: 180, width: 110, margin: "auto" }}
                   image={book.cover}
                   title={book.title}
+                  className="mt-3"
                 />
-                <CardContent className="cardContent">
+                <CardContent className="cardContent pb-1">
                   <Typography
-                    gutterBottom
-                    component="div">
-                    <strong>{book.title}</strong>
+                    className="lh-sm fw-bold"
+                  >
+                    {book.title}
                   </Typography>
                   <Typography
-                    variant="body2"
-                    color="text.secondary">
-                    {book.price.toFixed(2)}€
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary">
+                    className="fw-light lh-sm mt-1"
+                    style={{ fontSize: "0.9rem" }}
+                  >
                     {book.author} - {book.year}
+                  </Typography>
+                  <Typography
+                    className="fw-normal lh-sm mt-3"
+                  >
+                    {book.price.toFixed(2)}$
                   </Typography>
                 </CardContent>
                 <CardActions>
                   <ButtonMui
                     onClick={() => handleAddToCart(book)}
                     variant="outlined"
-                    size="small">
+                    size="small"
+                    style={{ fontSize: "0.75rem" }}>
                     Add to Cart
                   </ButtonMui>
                 </CardActions>

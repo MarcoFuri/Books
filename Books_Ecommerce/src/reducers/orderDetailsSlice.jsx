@@ -6,7 +6,13 @@ const orderDetailsSlice = createSlice({
     name: "ORDER_INFO",
     initialState,
     reducers: {
-        setOrderDetails(state, action) {
+        setUserOrderDetails(state, action) {
+            return {
+                ...state,
+                ...action.payload
+            }
+        },
+        setUserCardDetails(state, action) {
             return {
                 ...state,
                 ...action.payload
@@ -15,5 +21,5 @@ const orderDetailsSlice = createSlice({
     }
 })
 
-export const { setOrderDetails } = orderDetailsSlice.actions
+export const { setUserOrderDetails, setUserCardDetails } = orderDetailsSlice.actions
 export default orderDetailsSlice

@@ -8,32 +8,14 @@ import ReviewOrderPage from "./pages/ReviewOrderPage"
 import ProfilePage from './pages/ProfilePage'
 import LoginPage from "./pages/LoginPage"
 import SignUpPage from './pages/SignUpPage'
-import { Navbar, Nav } from 'react-bootstrap'
+import MyNavbar from './components/MyNavbar'
 import { Routes, Route, Navigate } from "react-router-dom"
-import { useSelector } from 'react-redux'
 
 function App() {
 
-  const loginStatus = useSelector(state => state.loginStatus)
-
   return (
     <>
-      <Navbar className="bg-dark text-white">
-        <h1 className="fw-bold my-2 ms-3 text-nowrap">The Book Club</h1>
-        <Nav className="me-auto">
-          { loginStatus ? 
-          <>
-            <Nav.Link className="text-light ms-3" href="/loginPage">Home</Nav.Link>
-            <Nav.Link className="text-light ms-3" href="/loginPage">Profile</Nav.Link>
-          </>
-          : 
-          <>
-            <Nav.Link className="text-light ms-3" href="/loginPage">Home</Nav.Link>
-            <Nav.Link className="text-light ms-3" href="/loginPage">Log in</Nav.Link>
-          </>
-          }
-        </Nav>
-      </Navbar>
+      <MyNavbar/>
       <Routes>
         <Route path="/mainPage" element={<MainPage />} />
         <Route path="/profilePage" element={<ProfilePage />} />
