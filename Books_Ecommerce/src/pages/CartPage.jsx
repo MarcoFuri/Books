@@ -99,9 +99,21 @@ function CartPage() {
         <>
             <Container className="cartContainer my-4 pb-5">
                 <div className="d-flex justify-content-between align-items-center mb-2">
-                    <p className="yourCart fw-bold h2 mt-2">YOUR CART</p>
+                    <p 
+                        className="yourCart fw-bold h2 mt-2"
+                        >
+                            YOUR CART
+                    </p>
                     <div>
-                        <ButtonMui onClick={() => navigate("/")}>
+                        <ButtonMui 
+                            onClick={() => navigate("/")}
+                            className="buttonHover"
+                            style={{ 
+                                fontFamily: "Work Sans, sans-serif",
+                                backgroundColor:"rgba(249, 246, 246, 0.7)",
+                                color:"black"
+                            }}
+                            >
                             Go back
                         </ButtonMui>
                     </div>
@@ -121,7 +133,10 @@ function CartPage() {
                                         <p className="fw-light lh-sm mb-2" style={{ fontSize: "0.85rem" }}>
                                             {book.author}
                                         </p>
-                                        <p className="h6 fw-light" style={{ fontSize: "0.85rem" }}>
+                                        <p 
+                                            className="h6 fw-light" 
+                                            style={{ fontSize: "0.85rem", fontFamily: "Work Sans, sans-serif" }}
+                                            >
                                             Published in: <span className="fw-normal">{book.year}</span>
                                         </p>
                                         {/* <p>x{book.quantity}</p> */}
@@ -161,7 +176,12 @@ function CartPage() {
                         )}
                     </Row>
                     :
-                    <p className="h5 fw-normal">Still nothing in your cart!</p>
+                    <p 
+                        className="h5 fw-normal"
+                        style={{ fontFamily: "Work Sans, sans-serif" }}
+                        >
+                            Still nothing in your cart!
+                    </p>
                 }
                 {checkoutError &&
                     <p className="h6 fw-light p-2 border border-1 border-danger rounded">Nothing to checkout, add some books first!</p>
@@ -173,16 +193,22 @@ function CartPage() {
                 className="position-fixed bottom-0 d-flex justify-content-between bg-light border px-5">
                 <Row className="align-items-center">
                     <Col className="me-1 my-2 p-1 px-3 bg-dark text-white rounded">
-                        <p className="m-0">Total</p>
+                        <p className="m-0" style={{fontSize:"0.8rem"}}>TOTAL</p>
                         <p className="h4 m-0">{cartTotalPrice.toFixed(2)}$</p>
                     </Col>
                     <Col>
                         <ButtonMui
                             onClick={() => handleClearCart()}
-                            className="text-nowrap"
+                            className="buttonHover text-nowrap px-1"
                             variant="outlined"
                             color="error"
                             size="small"
+                            style={{
+                                fontFamily:"Work Sans, sans-serif",
+                                backgroundColor:"rgba(249, 246, 246, 0.7)",
+                                height:"1.5rem",
+                                fontSize:"0.7rem"
+                            }}
                         >
                             Clear cart
                         </ButtonMui>
@@ -193,8 +219,15 @@ function CartPage() {
                     <Row>
                         <ButtonMui
                             onClick={handleGoToCheckout}
-                            variant="contained"
-                            className="my-3">
+                            variant="outlined"
+                            className="buttonHover my-3"
+                            style={{
+                                fontFamily:"Work Sans, sans-serif",
+                                color:"black",
+                                borderColor:"rgb(0,0,0,0.2)",
+                                backgroundColor:"rgba(249, 246, 246, 0.7)"
+                            }}
+                            >
                             Go to checkout
                         </ButtonMui>
                     </Row>
@@ -202,8 +235,15 @@ function CartPage() {
                     <Row>
                         <ButtonMui
                             onClick={() => navigate("/loginPage")}
-                            variant="contained"
-                            className="my-3">
+                            variant="outlined"
+                            className="buttonHover my-3"
+                            style={{
+                                fontFamily:"Work Sans, sans-serif",
+                                color:"black",
+                                borderColor:"rgb(0,0,0,0.2)",
+                                backgroundColor:"rgba(249, 246, 246, 0.7)"
+                            }}
+                            >
                             Login to checkout
                         </ButtonMui>
                     </Row>

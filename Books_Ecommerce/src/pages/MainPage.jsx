@@ -67,7 +67,6 @@ export default function MainPage() {
     }
   }, [])
 
-
   useEffect(() => {
     if (bookAdded) {
       if (!loginStatus) {
@@ -85,11 +84,17 @@ export default function MainPage() {
   const handleAddToCart = (book) => {
     dispatch(increaseQuantity())
     dispatch(addItem(book))
-    if (loginStatus && userLoggedCartStoredIndex === -1){
+    if (loginStatus && userLoggedCartStoredIndex === -1) {
       localStorage.setItem("usersCart", JSON.stringify([...usersCartStored, { ...userLoggedCartStored, cart: [book] }]))
     } else {
       setBookAdded(true)
     }
+  }
+
+  const buttonColors = {
+    backgroundColor:"rgba(249, 246, 246, 0.7)",
+    borderColor:"rgba(0, 0, 0, 0.2)",
+    color:"black"
   }
 
   return (
@@ -100,15 +105,23 @@ export default function MainPage() {
         {loginStatus ?
 
           <Row className="d-flex justify-content-between">
-            <p className="h6 fw-light m-2 pt-1 col-4">Logged in with: <br />
+            <p
+              className="h6 fw-light mt-3 col-4"
+              style={{fontSize:"0.8rem"}}
+            >
+              LOGGED IN WITH: <br />
               <span className="h6 fw-normal"> {userLogged.email}</span>
             </p>
             <ButtonMui
               onClick={() => navigate("/cartPage/")}
-              className="mx-4 my-3"
-              variant="contained"
+              className="buttonHover mx-4 my-3"
+              variant="outlined"
               size="small"
-              style={{ padding: "6px", width: "9rem" }}
+              style={{ 
+                padding: "6px", 
+                width: "9rem", 
+                ...buttonColors
+               }}
             >
               <img
                 src={CartIcon}
@@ -116,11 +129,17 @@ export default function MainPage() {
                 style={{ width: "14px" }}
                 className="mx-1"
               />
-              <p className="m-0 text-nowrap">
+              <p
+                className="m-0 text-nowrap text-dark"
+                style={{ fontFamily: "Work Sans, sans-serif" }}
+              >
                 Go to Cart
-                <span className="border border-1 bg-dark rounded-pill p-1 px-2 ms-1">
-                  {cartCounter}
-                </span>
+                  <span
+                    className="border border-1 bg-dark text-white rounded-circle ms-1"
+                    style={{ padding: "4px 8px 4px 8px" }}
+                  >
+                    {cartCounter}
+                  </span>
               </p>
             </ButtonMui>
           </Row>
@@ -128,10 +147,14 @@ export default function MainPage() {
           <Row className="justify-content-end">
             <ButtonMui
               onClick={() => navigate("/cartPage/")}
-              className="mx-4 my-3"
-              variant="contained"
+              className="buttonHover mx-4 my-3"
+              variant="outlined"
               size="small"
-              style={{ padding: "6px", width: "9rem" }}
+              style={{ 
+                padding: "6px", 
+                width: "9rem", 
+                ...buttonColors
+               }}
             >
               <img
                 src={CartIcon}
@@ -139,9 +162,12 @@ export default function MainPage() {
                 style={{ width: "14px" }}
                 className="mx-1"
               />
-              <p className="m-0 text-nowrap">
+              <p
+                className="m-0 text-nowrap"
+                style={{ fontFamily: "Work Sans, sans-serif", letterSpacing:"rem" }}
+              >
                 Go to Cart
-                <span className="border border-1 bg-dark rounded-pill p-1 px-2 ms-1">
+                <span className="border border-1 bg-dark text-white rounded-pill p-1 px-2 ms-1">
                   {cartCounter}
                 </span>
               </p>
@@ -153,17 +179,30 @@ export default function MainPage() {
 
         <div className="d-flex align-items-center mt-3">
           <TextField
-            // onChange={(e) => setSearchInputValue(e.target.value)}
             placeholder="Search"
             size="small"
             fullWidth
+            InputProps={{
+              style: {
+                fontFamily: "Work Sans, sans-serif", 
+                height:"2.2rem",
+                borderRadius:"4px 0 0 4px"
+              }
+            }}
           />
           <ButtonMui
-            // onClick={handleSearch}
-            // onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             variant="outlined"
+            className="buttonHover"
             type="button"
-            className="ms-1">
+            size="small"
+            style={{
+              fontFamily: "Work Sans, sans-serif", 
+              height:"2.2rem",
+              borderRadius:"0 4px 4px 0",
+              borderLeft: 0,
+              ...buttonColors
+            }}
+            >
             Search
           </ButtonMui>
         </div>
@@ -173,7 +212,9 @@ export default function MainPage() {
         <Row className="justify-content-evenly pb-4">
           {booksAvailable.map((book) =>
             <Col key={book.id} className="col-6 col-md-4 col-lg-3 my-3">
-              <Card className="card">
+              <Card 
+                className="card"
+                >
                 <CardMedia
                   sx={{ height: 180, width: 110, margin: "auto" }}
                   image={book.cover}
@@ -183,18 +224,19 @@ export default function MainPage() {
                 <CardContent className="cardContent pb-1">
                   <Typography
                     className="lh-sm fw-bold"
+                    style={{ fontFamily: "Work Sans, sans-serif" }}
                   >
                     {book.title}
                   </Typography>
                   <Typography
                     className="fw-light lh-sm mt-1"
-                    style={{ fontSize: "0.9rem" }}
+                    style={{ fontSize: "0.9rem", fontFamily: "Work Sans, sans-serif" }}
                   >
                     {book.author} - {book.year}
                   </Typography>
                   <Typography
                     className="fw-normal lh-sm mt-3"
-                    style={{fontSize:"0.9rem"}}
+                    style={{ fontSize: "0.9rem", fontFamily: "Work Sans, sans-serif"  }}
                   >
                     {book.price.toFixed(2)}$
                   </Typography>
@@ -202,9 +244,14 @@ export default function MainPage() {
                 <CardActions>
                   <ButtonMui
                     onClick={() => handleAddToCart(book)}
+                    className="buttonHover"
                     variant="outlined"
                     size="small"
-                    style={{ fontSize: "0.75rem" }}>
+                    style={{
+                      fontFamily: "Work Sans, sans-serif",
+                      ...buttonColors
+                    }}
+                  >
                     Add to Cart
                   </ButtonMui>
                 </CardActions>

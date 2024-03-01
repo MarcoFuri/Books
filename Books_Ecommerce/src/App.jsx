@@ -5,7 +5,7 @@ import CartPage from './pages/CartPage'
 import PaymentShippingPage from './pages/PaymentShippingPage'
 import PaymentDetailsPage from "./pages/PaymentDetailsPage"
 import ReviewOrderPage from "./pages/ReviewOrderPage"
-import ProfilePage from './pages/ProfilePage'
+import OrdersPage from './pages/OrdersPage'
 import LoginPage from "./pages/LoginPage"
 import SignUpPage from './pages/SignUpPage'
 import MyNavbar from './components/MyNavbar'
@@ -18,7 +18,7 @@ function App() {
       <MyNavbar/>
       <Routes>
         <Route path="/mainPage" element={<MainPage />} />
-        <Route path="/profilePage" element={<ProfilePage />} />
+        <Route path="/ordersPage" element={<OrdersPage />} />
         <Route path="/loginPage" element={<LoginPage />} />
         <Route path="/signUpPage" element={<SignUpPage />} />
         <Route path="/cartPage" element={<CartPage />} />

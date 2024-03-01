@@ -2,14 +2,11 @@ import ButtonMui from "@mui/material/Button"
 import { TextField, Typography, Grid, Checkbox, FormControlLabel } from "@mui/material"
 import { Container } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
-import { useState } from "react"
-import { useDispatch } from "react-redux"
-import { setUserOrderDetails } from "../reducers/orderDetailsSlice"
+import { useState, useEffect } from "react"
 
 function PaymentShippingPage() {
 
     const navigate = useNavigate()
-    const dispatch = useDispatch()
 
     const [checkboxStatus, setCheckboxStatus] = useState(false)
     const [firstName, setFirstName] = useState("")
@@ -33,9 +30,23 @@ function PaymentShippingPage() {
         setZip(cleanedInput)
     }
 
+    useEffect(() => {
+        if (localStorage.getItem("userShippingDetails")) {
+            const userOrdersDetailsSaved = JSON.parse(localStorage.getItem("userShippingDetails"))
+            setFirstName(userOrdersDetailsSaved.firstName)
+            setLastName(userOrdersDetailsSaved.lastName)
+            setAddress(userOrdersDetailsSaved.address)
+            setCity(userOrdersDetailsSaved.city)
+            setProvince(userOrdersDetailsSaved.province)
+            setZip(userOrdersDetailsSaved.zip)
+            setCountry(userOrdersDetailsSaved.country)
+            setCheckboxStatus(false)
+        }
+    }, [])
+
     const handleSubmit = () => {
-        //check form?        
-        dispatch(setUserOrderDetails({
+        //check form?
+        const userOrdersDetails = {
             firstName,
             lastName,
             address,
@@ -46,7 +57,8 @@ function PaymentShippingPage() {
             paymentAddress: checkboxStatus,
             orderPaymentAddress: checkboxStatus ? address : "",
             purchaseDate,
-        }))
+        }
+        localStorage.setItem("userShippingDetails", JSON.stringify(userOrdersDetails))
         navigate("/paymentDetailsPage")
 
     }
@@ -59,14 +71,22 @@ function PaymentShippingPage() {
                     <div>
                         <ButtonMui
                             onClick={() => navigate("/cartPage")}
-                            className="me-3">
+                            className="buttonHover me-3"
+                            style={{
+                                backgroundColor:"rgba(249, 246, 246, 0.7)",
+                                color:"black"
+                            }}
+                            >
                             Go back
                         </ButtonMui>
                     </div>
                 </div>
                 <div className="my-3 d-flex flex-wrap">
                     <div className="d-flex align-items-center pb-2">
-                            <span className="paymentPhaseCircle rounded-circle border border-primary me-2 bg-primary text-light">
+                            <span 
+                                className="rounded-circle border border-primary me-2 bg-primary text-light"
+                                style={{padding:"2px 12px 2px 12px"}}
+                                >
                                 1
                             </span>
                         <p className="m-0 p-0 fw-bold text-nowrap">Shipping details</p>
@@ -75,7 +95,10 @@ function PaymentShippingPage() {
                         </span>
                     </div>
                     <div className="d-flex align-items-center pb-2">
-                        <span className="paymentPhaseCircle rounded-circle mx-2 border bg-light ">
+                        <span 
+                            className="rounded-circle mx-2 border bg-light"
+                            style={{padding:"2px 10px 2px 10px"}}
+                            >
                             2
                         </span>
                         <p className="m-0 p-0 text-nowrap">Payment details</p>
@@ -84,7 +107,9 @@ function PaymentShippingPage() {
                         </span>
                     </div>
                     <div className="d-flex align-items-center pb-2">
-                        <span className="paymentPhaseCircle rounded-circle me-2 border bg-light ">
+                        <span className="rounded-circle me-2 border bg-light"
+                            style={{padding:"2px 10px 2px 10px"}} 
+                        >
                             3
                         </span>
                         <p className="m-0 p-0 text-nowrap">Review your order</p>
@@ -93,7 +118,9 @@ function PaymentShippingPage() {
                 
                 <Typography
                     variant="h6"
-                    className="my-4">
+                    className="my-4"
+                    style={{fontFamily:"Work Sans, sans-serif"}}
+                    >
                     Shipping address
                 </Typography>
                 <form onSubmit={() => handleSubmit()}>
@@ -108,6 +135,7 @@ function PaymentShippingPage() {
                                 fullWidth
                                 variant="filled"
                                 size="small"
+                                value={firstName}
                             />
                         </Grid>
                         <Grid item xs={6}>
@@ -121,6 +149,7 @@ function PaymentShippingPage() {
                                 autoComplete="family-name"
                                 variant="filled"
                                 size="small"
+                                value={lastName}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -134,6 +163,7 @@ function PaymentShippingPage() {
                                 variant="filled"
                                 size="small"
                                 helperText="Please enter your full address, including house number and street name (e.g., '123 Main Street')."
+                                value={address}
                             />
                         </Grid>
                         <Grid item xs={6}>
@@ -146,6 +176,7 @@ function PaymentShippingPage() {
                                 fullWidth
                                 variant="filled"
                                 size="small"
+                                value={city}
                             />
                         </Grid>
                         <Grid item xs={6}>
@@ -158,6 +189,7 @@ function PaymentShippingPage() {
                                 fullWidth
                                 variant="filled"
                                 size="small"
+                                value={province}
                             />
                         </Grid>
                         <Grid item xs={6}>
@@ -184,6 +216,7 @@ function PaymentShippingPage() {
                                 fullWidth
                                 variant="filled"
                                 size="small"
+                                value={country}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -191,8 +224,12 @@ function PaymentShippingPage() {
                                 control={
                                     <Checkbox
                                         onChange={() => handleChangeCheckbox()}
-                                        color="primary"
                                         name="saveAddress"
+                                        className="buttonHover"
+                                        style={{
+                                            backgroundColor:"rgba(0,0,0,0)",
+                                            color:"black"
+                                        }}
                                     />
                                 }
                                 label="Use same address for payment details"
@@ -201,9 +238,13 @@ function PaymentShippingPage() {
                         <div className="ms-4 mt-3 mb-5">
                             <ButtonMui
                                 type="submit"
-                                // onClick={() => handleNext()}
-                                variant="contained"
-                                className="ms-3">
+                                variant="outlined"
+                                className="buttonHover ms-3"
+                                style={{
+                                    color:"black",
+                                    backgroundColor:"rgba(249, 246, 246, 0.7)",
+                                    borderColor:"rgb(0,0,0,0.2)"
+                                }}>
                                 Next
                             </ButtonMui>
                         </div>

@@ -1,4 +1,5 @@
 import ButtonMui from "@mui/material/Button"
+import booksLogo from "../assets/booksLogo.png"
 import { Navbar, Nav } from "react-bootstrap"
 import { useSelector } from 'react-redux'
 import { setLoggedOut } from "../reducers/loginStatusSlice"
@@ -11,12 +12,12 @@ import { setQuantityCart } from "../reducers/cartQuantitySlice"
 
 export default function MyNavbar() {
 
-    const loginStatus = useSelector(state => state.loginStatus)
-    const userToRememberLoggedIn = localStorage.getItem("userToRememberLoggedIn")
+  const loginStatus = useSelector(state => state.loginStatus)
+  const userToRememberLoggedIn = localStorage.getItem("userToRememberLoggedIn")
 
 
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
 
   if (userToRememberLoggedIn) {
@@ -26,60 +27,84 @@ export default function MyNavbar() {
     }
   }
 
-    const handleLogout = () => {
-      if (confirm("Do you want to Logout?")){
-        dispatch(setLoggedOut())
-        localStorage.removeItem("userToRememberLoggedIn")
-        dispatch(setCart([]))
-        dispatch(setQuantityCart(0))
-        navigate("/mainPage")
-      }
+  const handleLogout = () => {
+    if (confirm("Do you want to Logout?")) {
+      dispatch(setLoggedOut())
+      localStorage.removeItem("userToRememberLoggedIn")
+      dispatch(setCart([]))
+      dispatch(setQuantityCart())
+      navigate("/mainPage")
     }
+  }
 
-    return (
-        <Navbar className="bg-dark text-white position-relative">
-        <h1 className="fw-bold my-2 ms-3 text-nowrap">The Book Club</h1>
-        <Nav className="me-auto">
-          { loginStatus ? 
+  return (
+    <Navbar className="bg-dark text-white justify-content-between p-0">
+      <div className="d-flex align-items-center">
+        <img 
+          src={booksLogo} 
+          alt="books logo" 
+          style={{width:"120px"}}
+          />
+        <h1
+          className="fw-bold text-nowrap"
+          style={{ fontFamily: "Anton, sans-serif" }}
+        >
+          THE BOOK CLUB
+        </h1>
+      </div>
+      <Nav
+        style={{ fontFamily: "Anton, sans-serif" }}
+      >
+        {loginStatus ?
           <>
-            <div className="d-flex">
-              <Nav.Link 
-                className="text-light ms-4"
+            <div className="d-flex gap-2">
+              <Nav.Link
+                className="text-light"
                 onClick={() => navigate("/mainPage")}
               >
-                  Home
+                HOME
               </Nav.Link>
-              <Nav.Link 
-                className="text-light ms-2" 
+              <Nav.Link
+                className="text-light"
                 onClick={() => navigate("/profilePage")}
               >
-                  Profile
+                PROFILE
+              </Nav.Link>
+              <Nav.Link
+                className="text-light"
+                onClick={() => navigate("/ordersPage")}
+              >
+                ORDERS
+              </Nav.Link>
+            <ButtonMui
+              onClick={handleLogout}
+              size="small"
+              className="ms-4 me-3"
+              style={{ fontFamily: "Anton, sans-serif", color: "brown" }}
+              >
+              LOGOUT
+            </ButtonMui>
+              </div>
+          </>
+          :
+          <>
+            <div className="d-flex gap-2 me-4">
+              <Nav.Link
+                className="text-light"
+                onClick={() => navigate("/mainPage")}
+              >
+                HOME
+              </Nav.Link>
+              <Nav.Link
+                className="text-light"
+                onClick={() => navigate("/loginPage")}
+              >
+                LOG IN
               </Nav.Link>
             </div>
-            <ButtonMui 
-              onClick={handleLogout}
-              size="small" 
-              className="position-absolute end-0 me-3 mt-1">
-              Logout
-            </ButtonMui>
           </>
-          : 
-          <>
-            <Nav.Link 
-              className="text-light ms-4" 
-              onClick={() => navigate("/mainPage")}
-              >
-                Home
-              </Nav.Link>
-            <Nav.Link 
-              className="text-light ms-2" 
-              onClick={() => navigate("/loginPage")}
-              >
-                Log in
-              </Nav.Link>
-          </>
-          }
-        </Nav>
-      </Navbar>
-    )
+        }
+      </Nav>
+    </Navbar>
+  )
 }

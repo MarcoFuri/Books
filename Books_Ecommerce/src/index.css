@@ -1,16 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
-body{
-    font-family: 'Roboto', sans-serif;
-    height: 100vh;
-}
-
-.welcomeTitle {
-    color: #ebebeb;
-    font-weight: 900;
-    font-family: 'Roboto Slab', serif;
-
+body {
+    font-family: "Work Sans", sans-serif;
 }
 
 .welcomeBackground {
@@ -37,10 +30,6 @@ body{
     right: 50%;
 }
 
-.paymentPhaseCircle {
-    padding: 2px 10px 2px 10px
-}
-
 .card {
     height: 100%;
   }
@@ -53,4 +42,8 @@ body{
 .checkoutContainers {
     width: 90vw;
     max-width: 60rem;
+}
+
+.buttonHover:hover {
+    background-color: rgba(255, 255, 255, 0.929) !important;
 }
