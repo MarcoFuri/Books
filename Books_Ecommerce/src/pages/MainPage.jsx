@@ -5,6 +5,7 @@ import CardMedia from '@mui/material/CardMedia';
 import ButtonMui from "@mui/material/Button"
 import Typography from '@mui/material/Typography';
 import CartIcon from "../assets/cart.svg"
+import booksLogo from "../assets/booksLogo.png"
 import { Container, Row, Col } from "react-bootstrap"
 import { useState, useEffect } from "react"
 import { addItem, setCart } from "../reducers/modifyCartSlice"
@@ -15,6 +16,7 @@ import { TextField } from '@mui/material';
 
 
 export default function MainPage() {
+
 
   const booksAvailable = [
     { id: "id989283", title: "Harry Potter and the Philosopher's Stone", year: 1999, price: 11.9, author: "J.K.Rowling", cover: "https://www.lafeltrinelli.it/images/9788831003384_0_536_0_75.jpg" },
@@ -81,6 +83,10 @@ export default function MainPage() {
     }
   }, [dispatch, myCart, bookAdded])
 
+  // useEffect(() => {
+  //   if 
+  // }, [cartCounter])
+
   const handleAddToCart = (book) => {
     dispatch(increaseQuantity())
     dispatch(addItem(book))
@@ -92,22 +98,22 @@ export default function MainPage() {
   }
 
   const buttonColors = {
-    backgroundColor:"rgba(249, 246, 246, 0.7)",
-    borderColor:"rgba(0, 0, 0, 0.2)",
-    color:"black"
+    backgroundColor: "rgba(249, 246, 246, 0.7)",
+    borderColor: "rgba(0, 0, 0, 0.2)",
+    color: "black"
   }
 
   return (
     <>
       <Container
         fluid
-        className="position-sticky top-0 border bg-light z-1">
+        className="position-sticky top-0 border bg-light z-2">
         {loginStatus ?
 
           <Row className="d-flex justify-content-between">
             <p
               className="h6 fw-light mt-3 col-4"
-              style={{fontSize:"0.8rem"}}
+              style={{ fontSize: "0.8rem" }}
             >
               LOGGED IN WITH: <br />
               <span className="h6 fw-normal"> {userLogged.email}</span>
@@ -117,11 +123,11 @@ export default function MainPage() {
               className="buttonHover mx-4 my-3"
               variant="outlined"
               size="small"
-              style={{ 
-                padding: "6px", 
-                width: "9rem", 
+              style={{
+                padding: "6px",
+                width: "9rem",
                 ...buttonColors
-               }}
+              }}
             >
               <img
                 src={CartIcon}
@@ -134,12 +140,12 @@ export default function MainPage() {
                 style={{ fontFamily: "Work Sans, sans-serif" }}
               >
                 Go to Cart
-                  <span
-                    className="border border-1 bg-dark text-white rounded-circle ms-1"
-                    style={{ padding: "4px 8px 4px 8px" }}
-                  >
-                    {cartCounter}
-                  </span>
+                <span
+                  className="border border-1 bg-dark text-white rounded-circle ms-1"
+                  style={{ padding: "4px 8px 4px 8px" }}
+                >
+                  {cartCounter}
+                </span>
               </p>
             </ButtonMui>
           </Row>
@@ -150,11 +156,11 @@ export default function MainPage() {
               className="buttonHover mx-4 my-3"
               variant="outlined"
               size="small"
-              style={{ 
-                padding: "6px", 
-                width: "9rem", 
+              style={{
+                padding: "6px",
+                width: "9rem",
                 ...buttonColors
-               }}
+              }}
             >
               <img
                 src={CartIcon}
@@ -164,7 +170,7 @@ export default function MainPage() {
               />
               <p
                 className="m-0 text-nowrap"
-                style={{ fontFamily: "Work Sans, sans-serif", letterSpacing:"rem" }}
+                style={{ fontFamily: "Work Sans, sans-serif", letterSpacing: "rem" }}
               >
                 Go to Cart
                 <span className="border border-1 bg-dark text-white rounded-pill p-1 px-2 ms-1">
@@ -184,9 +190,9 @@ export default function MainPage() {
             fullWidth
             InputProps={{
               style: {
-                fontFamily: "Work Sans, sans-serif", 
-                height:"2.2rem",
-                borderRadius:"4px 0 0 4px"
+                fontFamily: "Work Sans, sans-serif",
+                height: "2.2rem",
+                borderRadius: "4px 0 0 4px"
               }
             }}
           />
@@ -196,30 +202,62 @@ export default function MainPage() {
             type="button"
             size="small"
             style={{
-              fontFamily: "Work Sans, sans-serif", 
-              height:"2.2rem",
-              borderRadius:"0 4px 4px 0",
+              fontFamily: "Work Sans, sans-serif",
+              height: "2.2rem",
+              borderRadius: "0 4px 4px 0",
               borderLeft: 0,
               ...buttonColors
             }}
-            >
+          >
             Search
           </ButtonMui>
         </div>
       </Container>
 
+      <Container fluid className="bg-light mt-3">
+        <Row
+          style={{ height: "25rem" }}
+          className="d-flex"
+        >
+          <div className="col-6 d-flex flex-column">
+            <Col className="col-8 h2 pt-4 ps-5 m-0 z-1" style={{ height: "6rem" }}>REDISCOVER YOUR PASSION FOR <span className="fw-bold">BOOKS</span></Col>
+            <Col>
+              <img
+                src={booksLogo}
+                className="mt-3 ms-5"
+                alt="logo"
+                style={{ width: "300px", }}
+              />
+            </Col>
+          </div>
+          <div className="col-5 mt-5">
+            <Col className="mb-4 ms-2 ps-1">
+              Find your next <span className="fw-bold">favorite</span> generation of <span className="fw-bold">inpiring</span> people.
+            </Col>
+            <Col className="ms-2">
+              <img src={booksAvailable[0].cover} style={{width:"130px", height:"180px"}} className="ms-2 mt-4" alt="" />
+              <img src={booksAvailable[1].cover} style={{width:"130px", height:"180px"}} className="ms-2 mt-4" alt="" />
+              <img src={booksAvailable[2].cover} style={{width:"130px", height:"180px"}} className="ms-2 mt-4" alt="" />
+            </Col>
+          </div>
+        </Row>
+      </Container>
+
       <Container className="mt-1">
         <Row className="justify-content-evenly pb-4">
-          {booksAvailable.map((book) =>
-            <Col key={book.id} className="col-6 col-md-4 col-lg-3 my-3">
-              <Card 
+          {booksAvailable.map((book, index) =>
+            <Col key={index} className="col-6 col-md-4 col-lg-3 my-3">
+              <Card
                 className="card"
-                >
+              >
                 <CardMedia
-                  sx={{ height: 180, width: 110, margin: "auto" }}
                   image={book.cover}
                   title={book.title}
-                  className="mt-3"
+                  className="mt-3 mx-auto"
+                  style={{
+                    height:"180px",
+                    width:"120px"
+                  }}
                 />
                 <CardContent className="cardContent pb-1">
                   <Typography
@@ -232,13 +270,13 @@ export default function MainPage() {
                     className="fw-light lh-sm mt-1"
                     style={{ fontSize: "0.9rem", fontFamily: "Work Sans, sans-serif" }}
                   >
-                    {book.author} - {book.year}
+                    {book.author} - {book.publishDate}
                   </Typography>
                   <Typography
                     className="fw-normal lh-sm mt-3"
-                    style={{ fontSize: "0.9rem", fontFamily: "Work Sans, sans-serif"  }}
+                    style={{ fontSize: "0.9rem", fontFamily: "Work Sans, sans-serif" }}
                   >
-                    {book.price.toFixed(2)}$
+                    {Number(book.price).toFixed(2)}$
                   </Typography>
                 </CardContent>
                 <CardActions>

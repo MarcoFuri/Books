@@ -219,7 +219,7 @@ export default function PaymentDetailsPage() {
                                 id="cardNumber"
                                 name="cardNumber"
                                 label="Card number"
-                                inputProps={{ inputMode: 'numeric', maxLength: 16, minLength: 16 }}
+                                inputProps={{ inputMode: 'numeric', maxLength: 16, minLength: 11 }}
                                 value={cardNumber}
                                 fullWidth
                                 autoComplete="cardNumber"

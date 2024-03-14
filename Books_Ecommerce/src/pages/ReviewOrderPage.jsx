@@ -27,8 +27,9 @@ export default function ReviewOrderPage() {
     const newOrder = {
         orderNumber: "",
         email: emailUserLogged,
-        userLoggedCartStored,
-        orderDetails
+        userCart: userLoggedCartStored,
+        orderShippingDetails: orderDetails,
+        cardDetails: cardOrderDetails
     }
 
     const handleCancelOrder = () => {
@@ -70,6 +71,8 @@ export default function ReviewOrderPage() {
         dispatch(clearQuantityCart())
 
         setTimeout(() => {
+            localStorage.removeItem("userShippingDetails")
+            localStorage.removeItem("cardOrderDetails")
             navigate("/mainPage")
         }, 6000)
     }
@@ -190,14 +193,14 @@ export default function ReviewOrderPage() {
                             <p className="h5">Payment details</p>
                             <Col className="col-6">
                                 <p className="m-0"><span className="fw-light">Card name:</span> {cardOrderDetails.cardName}</p>
-                                <p className="m-0"><span className="fw-light">Card number:</span> xxxx-xxxx-xxxx-{cardOrderDetails.cardNumber.substring(12)}</p>
+                                <p className="m-0"><span className="fw-light">Card number:</span> xxxx-xxxx-xxxx-{cardOrderDetails.cardNumber.substring(cardOrderDetails.cardNumber.length - 4)}</p>
                                 <p className="m-0"><span className="fw-light">Expiration date: </span>
                                     {cardOrderDetails.expiryDateMonth < 10 ? "0" + cardOrderDetails.expiryDateMonth : cardOrderDetails.expiryDateMonth}/{cardOrderDetails.expiryDateYear}
                                 </p>
                                 <p className="m-0"><span className="fw-light">Purchase date: </span>{cardOrderDetails.purchaseDate}</p>
                             </Col>
 
-                            {cardOrderDetails.orderPaymentAddress.address &&
+                            {cardOrderDetails.orderPaymentAddress?.address &&
                                 <Col>
                                     <p className="m-0">{cardOrderDetails.orderPaymentAddress.address}</p>
                                     <p className="m-0">{cardOrderDetails.orderPaymentAddress.city} - {cardOrderDetails.orderPaymentAddress.province} {cardOrderDetails.orderPaymentAddress.zip}</p>
