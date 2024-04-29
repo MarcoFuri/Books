@@ -108,7 +108,9 @@ function CartPage() {
                 </div>
                 {cartWithProducts ?
                     <Row className="pb-5">
-                        {myCart.map((book, index) =>
+                        {myCart.map((book, index) => {
+                            cartTotalPrice += (book.price * book.quantity)
+                            return (
                             <Col key={index} className="bg-light m-2 p-3 rounded border border-2 col-12 d-flex justify-content-between position-relative">
                                 <div className="d-flex">
                                     <img
@@ -132,9 +134,6 @@ function CartPage() {
                                 </div>
                                 <p className="h5 fw-bold">
                                     {/* {book.price.toFixed(2)}$ */}
-                                    <span className="d-none">
-                                        {cartTotalPrice += (book.price * book.quantity)}
-                                    </span>
                                 </p>
                                 <div className="position-absolute d-flex end-0 bottom-0 m-3">
                                     <ButtonMui
@@ -161,6 +160,8 @@ function CartPage() {
                                 </div>
 
                             </Col>
+                            )
+                        }
                         )}
                     </Row>
                     :

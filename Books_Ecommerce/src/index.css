@@ -29,10 +29,6 @@ body {
     left: 40%;
     right: 50%;
 }
-
-.card {
-    height: 100%;
-  }
   
 .cardContent {
     flex-grow: 1;

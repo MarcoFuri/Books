@@ -6,7 +6,7 @@ import ButtonMui from "@mui/material/Button"
 import Typography from '@mui/material/Typography';
 import CartIcon from "../assets/cart.svg"
 import booksLogo from "../assets/booksLogo.png"
-import { Container, Row, Col } from "react-bootstrap"
+import { Container, Row, Col, Spinner } from "react-bootstrap"
 import { useState, useEffect } from "react"
 import { addItem, setCart } from "../reducers/modifyCartSlice"
 import { increaseQuantity, setQuantityCart } from "../reducers/cartQuantitySlice"
@@ -17,22 +17,6 @@ import { TextField } from '@mui/material';
 
 export default function MainPage() {
 
-
-  const booksAvailable = [
-    { id: "id989283", title: "Harry Potter and the Philosopher's Stone", year: 1999, price: 11.9, author: "J.K.Rowling", cover: "https://www.lafeltrinelli.it/images/9788831003384_0_536_0_75.jpg" },
-    { id: "id987364", title: "Harry Potter and the Chamber of Secrets", year: 2000, price: 11.9, author: "J.K.Rowling", cover: "https://bg.isbn.host4g.ru/images_isbn/9781408855669.jpg" },
-    { id: "id983423", title: "Harry Potter and the Prisoner of Azkaban", year: 2001, price: 12.9, author: "J.K.Rowling", cover: "https://m.media-amazon.com/images/I/81NQA1BDlnL._AC_UF1000,1000_QL80_.jpg" },
-    { id: "id951523", title: "Harry Potter and the Goblet of Fire", year: 2003, price: 12.5, author: "J.K.Rowling", cover: "https://m.media-amazon.com/images/I/81BownMW+fL._AC_UF1000,1000_QL80_.jpg" },
-    { id: "id986787", title: "Harry Potter and the Order of the Phoenix", year: 2004, price: 12.5, author: "J.K.Rowling", cover: "https://m.media-amazon.com/images/I/813lOXWdSNL._AC_UF1000,1000_QL80_.jpg" },
-    { id: "id967893", title: "Harry Potter and the Half-Blood Prince", year: 2007, price: 13.9, author: "J.K.Rowling", cover: "https://www.bokklubben.no/servlet/VisBildeServlet?produktId=10231124&width=600" },
-    { id: "id989353", title: "Harry Potter and the Deathly Hallows", year: 2009, price: 13.9, author: "J.K.Rowling", cover: "https://m.media-amazon.com/images/I/81W7uynFyWL._AC_UF1000,1000_QL80_.jpg" },
-    { id: "id989238", title: "Harry Potter and the Philosopher's Stone", year: 1999, price: 11.9, author: "J.K.Rowling", cover: "https://www.lafeltrinelli.it/images/9788831003384_0_536_0_75.jpg" },
-    { id: "id217368", title: "Harry Potter and the Chamber of Secrets", year: 2000, price: 11.9, author: "J.K.Rowling", cover: "https://bg.isbn.host4g.ru/images_isbn/9781408855669.jpg" },
-    { id: "id238971", title: "Harry Potter and the Prisoner of Azkaban", year: 2001, price: 12.9, author: "J.K.Rowling", cover: "https://m.media-amazon.com/images/I/81NQA1BDlnL._AC_UF1000,1000_QL80_.jpg" },
-    { id: "id732892", title: "Harry Potter and the Goblet of Fire", year: 2003, price: 12.5, author: "J.K.Rowling", cover: "https://m.media-amazon.com/images/I/81BownMW+fL._AC_UF1000,1000_QL80_.jpg" },
-    { id: "id912738", title: "Harry Potter and the Order of the Phoenix", year: 2004, price: 12.5, author: "J.K.Rowling", cover: "https://m.media-amazon.com/images/I/813lOXWdSNL._AC_UF1000,1000_QL80_.jpg" },
-  ]
-
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -42,6 +26,11 @@ export default function MainPage() {
   const loginStatus = useSelector(state => state.loginStatus)
 
   const [bookAdded, setBookAdded] = useState(false)
+  const [booksFetched, setBooksFetched] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [searchingData, setSearchingData] = useState("")
+  const [booksSearched, setBooksSearched] = useState(null)
+  const [queryNotFound, setQueryNotFound] = useState(false)
 
   const unmatchedCartStored = localStorage.getItem("unmatchedCart") ?
     JSON.parse(localStorage.getItem("unmatchedCart")) : []
@@ -70,6 +59,30 @@ export default function MainPage() {
   }, [])
 
   useEffect(() => {
+    fetch("http://localhost:5050/books")
+      .then((res) => res.json())
+      .then((data) => {
+        setBooksFetched(data)
+        setTimeout(() => {
+          setLoading(true)
+        }, 1000)
+      })
+  }, [])
+
+  const querySearch = () => {
+    setQueryNotFound(false)
+    fetch("http://localhost:5050/books/" + searchingData)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.length <= 0) {
+          setQueryNotFound(true)
+        } else {
+          setBooksSearched(data)
+        }
+      })
+  }
+
+  useEffect(() => {
     if (bookAdded) {
       if (!loginStatus) {
         localStorage.setItem("unmatchedCart", JSON.stringify(myCart))
@@ -82,10 +95,6 @@ export default function MainPage() {
       }
     }
   }, [dispatch, myCart, bookAdded])
-
-  // useEffect(() => {
-  //   if 
-  // }, [cartCounter])
 
   const handleAddToCart = (book) => {
     dispatch(increaseQuantity())
@@ -185,6 +194,7 @@ export default function MainPage() {
 
         <div className="d-flex align-items-center mt-3">
           <TextField
+            onChange={(e) => setSearchingData(e.target.value)}
             placeholder="Search"
             size="small"
             fullWidth
@@ -197,6 +207,7 @@ export default function MainPage() {
             }}
           />
           <ButtonMui
+            onClick={querySearch}
             variant="outlined"
             className="buttonHover"
             type="button"
@@ -214,90 +225,185 @@ export default function MainPage() {
         </div>
       </Container>
 
-      <Container fluid className="bg-light mt-3">
-        <Row
-          style={{ height: "25rem" }}
-          className="d-flex"
-        >
-          <div className="col-6 d-flex flex-column">
-            <Col className="col-8 h2 pt-4 ps-5 m-0 z-1" style={{ height: "6rem" }}>REDISCOVER YOUR PASSION FOR <span className="fw-bold">BOOKS</span></Col>
-            <Col>
-              <img
-                src={booksLogo}
-                className="mt-3 ms-5"
-                alt="logo"
-                style={{ width: "300px", }}
-              />
-            </Col>
-          </div>
-          <div className="col-5 mt-5">
-            <Col className="mb-4 ms-2 ps-1">
-              Find your next <span className="fw-bold">favorite</span> generation of <span className="fw-bold">inpiring</span> people.
-            </Col>
-            <Col className="ms-2">
-              <img src={booksAvailable[0].cover} style={{width:"130px", height:"180px"}} className="ms-2 mt-4" alt="" />
-              <img src={booksAvailable[1].cover} style={{width:"130px", height:"180px"}} className="ms-2 mt-4" alt="" />
-              <img src={booksAvailable[2].cover} style={{width:"130px", height:"180px"}} className="ms-2 mt-4" alt="" />
-            </Col>
-          </div>
-        </Row>
-      </Container>
+      {!loading &&
 
-      <Container className="mt-1">
-        <Row className="justify-content-evenly pb-4">
-          {booksAvailable.map((book, index) =>
-            <Col key={index} className="col-6 col-md-4 col-lg-3 my-3">
-              <Card
-                className="card"
-              >
-                <CardMedia
-                  image={book.cover}
-                  title={book.title}
-                  className="mt-3 mx-auto"
-                  style={{
-                    height:"180px",
-                    width:"120px"
-                  }}
-                />
-                <CardContent className="cardContent pb-1">
-                  <Typography
-                    className="lh-sm fw-bold"
-                    style={{ fontFamily: "Work Sans, sans-serif" }}
-                  >
-                    {book.title}
-                  </Typography>
-                  <Typography
-                    className="fw-light lh-sm mt-1"
-                    style={{ fontSize: "0.9rem", fontFamily: "Work Sans, sans-serif" }}
-                  >
-                    {book.author} - {book.publishDate}
-                  </Typography>
-                  <Typography
-                    className="fw-normal lh-sm mt-3"
-                    style={{ fontSize: "0.9rem", fontFamily: "Work Sans, sans-serif" }}
-                  >
-                    {Number(book.price).toFixed(2)}$
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <ButtonMui
-                    onClick={() => handleAddToCart(book)}
-                    className="buttonHover"
-                    variant="outlined"
-                    size="small"
+        <div className="text-center mt-5">
+          <Spinner
+            animation="border"
+            variant="dark"
+            role="status">
+          </Spinner>
+        </div>
+      }
+
+      {loading && !booksSearched ?
+        <>
+          <Container fluid className="bg-light mt-3">
+            <Row
+              style={{ height: "25rem" }}
+              className="d-flex"
+            >
+              <div className="col-6 d-flex flex-column">
+                <Col className="col-8 h2 pt-4 ps-5 m-0 z-1" style={{ height: "6rem" }}>REDISCOVER YOUR PASSION FOR <span className="fw-bold">BOOKS</span></Col>
+                <Col>
+                  <img
+                    src={booksLogo}
+                    className="mt-3 ms-"
+                    alt="logo"
+                    style={{ width: "300px", }}
+                  />
+                </Col>
+              </div>
+              <div className="col-5 mt-5">
+                <Col className="mb-4 ms-2 ps-1">
+                  Find your next <span className="fw-bold">favorite</span> generation of <span className="fw-bold">inpiring</span> people.
+                </Col>
+                <Col className="ms-2">
+                  <img src={booksFetched[0].coverImg} style={{ width: "125px", height: "180px" }} className="ms-2 mt-4" alt="" />
+                  <img src={booksFetched[1].coverImg} style={{ width: "125px", height: "180px" }} className="ms-2 mt-4" alt="" />
+                  <img src={booksFetched[2].coverImg} style={{ width: "125px", height: "180px" }} className="ms-2 mt-4" alt="" />
+                </Col>
+              </div>
+            </Row>
+          </Container>
+
+          <Container className="mt-1">
+            <Row className="justify-content-evenly pb-4">
+              {booksFetched.map((book, index) =>
+                <Col key={index} className="col-6 col-md-4 col-lg-3 my-3">
+                  <Card
+                    className="position-relative"
                     style={{
-                      fontFamily: "Work Sans, sans-serif",
-                      ...buttonColors
+                      height: "100%",
+                      backgroundColor: "#fcfcfc"
                     }}
                   >
-                    Add to Cart
-                  </ButtonMui>
-                </CardActions>
-              </Card>
-            </Col>
-          )}
-        </Row>
-      </Container>
+                    <CardMedia
+                      image={book.coverImg}
+                      title={book.title}
+                      className="mt-3 mx-auto"
+                      style={{
+                        height: "180px",
+                        width: "120px"
+                      }}
+                    />
+                    <CardContent className="cardContent pb-1">
+                      <Typography
+                        className="lh-sm fw-bold"
+                        style={{ fontFamily: "Work Sans, sans-serif" }}
+                      >
+                        {book.title}
+                      </Typography>
+                      <Typography
+                        className="fw-light lh-sm mt-1"
+                        style={{ fontSize: "0.9rem", fontFamily: "Work Sans, sans-serif" }}
+                      >
+                        {book.author} - {book.publishedYear}
+                      </Typography>
+                      <Typography
+                        className="fw-normal lh-sm mt-3"
+                        style={{ fontSize: "0.9rem", fontFamily: "Work Sans, sans-serif" }}
+                      >
+                        {Number(book.price).toFixed(2)}$
+                      </Typography>
+                    </CardContent>
+                    <CardActions>
+                      <ButtonMui
+                        onClick={() => handleAddToCart(book)}
+                        className="buttonHover position-absolute bottom-0 end-0 mb-2 me-2"
+                        variant="outlined"
+                        size="small"
+                        style={{
+                          fontFamily: "Work Sans, sans-serif",
+                          ...buttonColors,
+                          backgroundColor: "#f5fafb"
+                        }}
+                      >
+                        Add to Cart
+                      </ButtonMui>
+                    </CardActions>
+                  </Card>
+                </Col>
+              )}
+            </Row>
+          </Container>
+        </>
+        :
+        <>
+          {queryNotFound ?
+            <p
+              className="mt-4 ms-5 ps-5"
+              style={{
+                fontFamily: "Work Sans, sans-serif",
+                fontWeight: "500"
+              }}
+            >Your <span className="fw-bold">research</span> has found <span className="fw-bold">no matches!</span> Please try again!
+            </p>
+            :
+            <Container className="mt-1">
+              <Row className="justify-content-evenly pb-4">
+                {booksSearched?.map((book, index) =>
+                  <Col key={index} className="col-6 col-md-4 col-lg-3 my-3">
+                    <Card
+                      className="position-relative"
+                      style={{
+                        height: "100%",
+                        backgroundColor: "#fcfcfc"
+                      }}
+                    >
+                      <CardMedia
+                        image={book.coverImg}
+                        title={book.title}
+                        className="mt-3 mx-auto"
+                        style={{
+                          height: "180px",
+                          width: "120px"
+                        }}
+                      />
+                      <CardContent className="cardContent pb-1">
+                        <Typography
+                          className="lh-sm fw-bold"
+                          style={{ fontFamily: "Work Sans, sans-serif" }}
+                        >
+                          {book.title}
+                        </Typography>
+                        <Typography
+                          className="fw-light lh-sm mt-1"
+                          style={{ fontSize: "0.9rem", fontFamily: "Work Sans, sans-serif" }}
+                        >
+                          {book.author} - {book.publishedYear}
+                        </Typography>
+                        <Typography
+                          className="fw-normal lh-sm mt-3"
+                          style={{ fontSize: "0.9rem", fontFamily: "Work Sans, sans-serif" }}
+                        >
+                          {Number(book.price).toFixed(2)}$
+                        </Typography>
+                      </CardContent>
+                      <CardActions>
+                        <ButtonMui
+                          onClick={() => handleAddToCart(book)}
+                          className="buttonHover position-absolute bottom-0 end-0 mb-2 me-2"
+                          variant="outlined"
+                          size="small"
+                          style={{
+                            fontFamily: "Work Sans, sans-serif",
+                            ...buttonColors,
+                            backgroundColor: "#f5fafb"
+                          }}
+                        >
+                          Add to Cart
+                        </ButtonMui>
+                      </CardActions>
+                    </Card>
+                  </Col>
+                )}
+
+              </Row>
+            </Container>
+          }
+        </>
+      }
     </>
   );
 }

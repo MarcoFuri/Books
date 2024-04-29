@@ -71,7 +71,7 @@ export default function MyNavbar() {
             <div className="d-flex gap-2">
               <Nav.Link
                 className="text-light"
-                onClick={() => navigate("/mainPage")}
+                onClick={() => navigate("/")}
               >
                 HOME
               </Nav.Link>
