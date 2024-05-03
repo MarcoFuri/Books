@@ -5,8 +5,6 @@ import { useNavigate } from "react-router-dom"
 
 export default function SignUpPage() {
 
-    const existingUsers = JSON.parse(localStorage.getItem("existingUsers")) || []
-
     const navigate = useNavigate()
 
     const [firstName, setFirstName] = useState("")
@@ -21,28 +19,17 @@ export default function SignUpPage() {
 
     const [loading, setLoading] = useState(false)
 
-    const [users, setUsers] = useState(existingUsers)
-
-    useEffect(() => {
-        const updatesUsers = JSON.stringify(users)
-        localStorage.setItem("existingUsers", updatesUsers)
-    }, [users])
-
     useEffect(() => {
         setExistingUserError(false)
     }, [email])
 
-    const handleSignUp = () => {
+    async function handleSignUp () {
 
         if (emailFormatError || existingUserError || password1Error || password2Error) {
             return
         }
 
-        if (existingUsers.length > 0) {
-            if (existingUsers.find((el) => el.email === email) !== undefined) {
-                return setExistingUserError(true)
-            }
-        }
+        console.log("handlesignup:", email)
 
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[._%+\-!?@])[a-zA-Z0-9._%+\-!?@]{8,}$/;
@@ -57,24 +44,39 @@ export default function SignUpPage() {
             setPassword2Error(true)
             setTimeout(() => setPassword2Error(false), 4000)
         } else {
-            setLoading(true)
             const newUser = {
                 firstName,
                 lastName,
                 email,
                 password: password1,
             }
-            setUsers(
-                [
-                    ...users,
-                    newUser
-                ]
-            )
-            
-            setTimeout(() => {
-                navigate("/loginPage")
-            }
-                , 2000)
+
+            let bodyString = JSON.stringify(newUser)
+            await fetch("http://localhost:5050/users/create", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: bodyString,
+            })
+            .then(res => {
+                if(!res.ok) {
+                    console.log("Failed to save a new user")
+                    setExistingUserError(true)
+                } else {
+                    setLoading(true)
+                    console.log(res)
+                    console.log(newUser)
+                    console.log("NewUser saved successfully")
+                    setTimeout(() => {
+                            navigate("/loginPage")
+                        }
+                        , 2000)
+                }
+            })
+            .catch(err => {
+                console.log("Unable to save the new user, error " + err)
+            }) 
         }
     }
 

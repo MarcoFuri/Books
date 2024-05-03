@@ -20,77 +20,79 @@ function LoginPage() {
     const dispatch = useDispatch()
 
     const [email, setEmail] = useState("")
-    const [emailNotFoundError, setEmailNotFoundError] = useState(false)
     const [password, setPassword] = useState("")
-    const [incorrectPasswordError, setIncorrectPasswordError] = useState(false)
+    const [userNotFoundError, setUserNotFoundError] = useState(false)
     const [checkboxStatus, setCheckboxStatus] = useState(false)
 
-    const users = JSON.parse(localStorage.getItem("existingUsers"))
+    // const users = JSON.parse(localStorage.getItem("existingUsers"))
 
-    const usersCartStored = localStorage.getItem("usersCart") ?
-    JSON.parse(localStorage.getItem("usersCart")) : []
-
-    const unmatchedCartStored = JSON.parse(localStorage.getItem("unmatchedCart"))
-
-    const handleEmailChange = (e) => {
-        setEmailNotFoundError(false)
-        setEmail(e)
-    }
+    // const usersCartStored = localStorage.getItem("usersCart") ?
+    // JSON.parse(localStorage.getItem("usersCart")) : []
+    //
+    // const unmatchedCartStored = JSON.parse(localStorage.getItem("unmatchedCart"))
 
     const handleCheckboxStatus = () => {
         setCheckboxStatus(!checkboxStatus)
     }
 
-    const handleSignIn = () => {
-
-        if (users === null) {
-            setEmailNotFoundError(true)
-            return setTimeout(() => setEmailNotFoundError(false), 4000)
-        }
-
-        const indexUser = users.findIndex((el) => el.email === email)
-
-        if (indexUser === -1) {
-            setEmailNotFoundError(true)
-            setTimeout(() => setEmailNotFoundError(false), 5000)
-        } else if (users[indexUser].password !== password) {
-            setIncorrectPasswordError(true)
-            setTimeout(() => setIncorrectPasswordError(false), 4000)
-        } else {
-            if (checkboxStatus) {
-                const userToRememberLoggedIn = JSON.stringify(users[indexUser])
-                localStorage.setItem("userToRememberLoggedIn", userToRememberLoggedIn)
-            }
-            dispatch(setLoggedIn())
-            dispatch(setUserLogged(users[indexUser]))
-            // if unmatched cart exists, push it in the user existing cart.
-            // if the userCart doesn't exist, create it and set it with all the unmatched cart items.
-            const userLoggingInCartStored = usersCartStored.find((el) => el.email === users[indexUser].email) !== undefined ?
-            usersCartStored.find((el) => el.email === users[indexUser].email) : { email: users[indexUser].email, cart: [] }
-            console.log("the user cart is this:", userLoggingInCartStored)
-
-            const userLoggingInCartStoredIndex = usersCartStored.findIndex((el) => el.email === users[indexUser].email)
-
-
-            if (unmatchedCartStored) {
-                unmatchedCartStored.forEach((unmatchedBook) => {
-                    const bookAlreadyAdded = userLoggingInCartStored.cart.find( (userBook) => unmatchedBook.id === userBook.id )
-                    if (bookAlreadyAdded) {
-                        bookAlreadyAdded.quantity += 1
-                    } else {
-                        userLoggingInCartStored.cart.push(unmatchedBook)
+    const handleSignIn = async () => {
+        await fetch("http://localhost:5050/users/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: `${email}`,
+                password: `${password}`
+            })
+        })
+            .then(res => {
+                if(!res.ok) {
+                    console.log("User not found")
+                    setUserNotFoundError(true)
+                } else {
+                    res.json()
+                    if (checkboxStatus) {
+                        const userToRememberLoggedIn = JSON.stringify({email, password})
+                        localStorage.setItem("userToRememberLoggedIn", userToRememberLoggedIn)
                     }
-                })
-                if (userLoggingInCartStoredIndex === -1) {
-                    usersCartStored.push(userLoggingInCartStored)
+                    dispatch(setLoggedIn())
+                    dispatch(setUserLogged({email, password}))
+                    navigate("/mainPage")
                 }
-                localStorage.setItem("usersCart", JSON.stringify(usersCartStored))
-                localStorage.removeItem("unmatchedCart")
-            }
+            })
 
-            navigate("/mainPage")
+            // if (checkboxStatus) {
+            //     const userToRememberLoggedIn = JSON.stringify(users[indexUser])
+            //     localStorage.setItem("userToRememberLoggedIn", userToRememberLoggedIn)
+            // }
+            // dispatch(setLoggedIn())
+            // dispatch(setUserLogged(users[indexUser]))
+            //
+            //
+            // const userLoggingInCartStored = usersCartStored.find((el) => el.email === users[indexUser].email) !== undefined ?
+            // usersCartStored.find((el) => el.email === users[indexUser].email) : { email: users[indexUser].email, cart: [] }
+            // console.log("the user cart is this:", userLoggingInCartStored)
+            //
+            // const userLoggingInCartStoredIndex = usersCartStored.findIndex((el) => el.email === users[indexUser].email)
+
+
+            // if (unmatchedCartStored) {
+            //     unmatchedCartStored.forEach((unmatchedBook) => {
+            //         const bookAlreadyAdded = userLoggingInCartStored.cart.find( (userBook) => unmatchedBook.id === userBook.id )
+            //         if (bookAlreadyAdded) {
+            //             bookAlreadyAdded.quantity += 1
+            //         } else {
+            //             userLoggingInCartStored.cart.push(unmatchedBook)
+            //         }
+            //     })
+            //     if (userLoggingInCartStoredIndex === -1) {
+            //         usersCartStored.push(userLoggingInCartStored)
+            //     }
+            //     localStorage.setItem("usersCart", JSON.stringify(usersCartStored))
+            //     localStorage.removeItem("unmatchedCart")
+            // }
         }
-    }
 
     return (
         <Grid
@@ -122,7 +124,7 @@ function LoginPage() {
                     </Typography>
                     <Grid>
                         <TextField
-                            onChange={(e) => handleEmailChange(e.target.value)}
+                            onChange={(e) => setEmail(e.target.value)}
                             required
                             margin="normal"
                             fullWidth
@@ -132,8 +134,8 @@ function LoginPage() {
                             autoComplete="email"
                             autoFocus
                             variant="filled"
-                            error={emailNotFoundError}
-                            helperText={emailNotFoundError && "Email not associated with an account yet, please Sign Up!"}
+                            error={userNotFoundError}
+                            helperText={userNotFoundError && "Email or password not correct."}
                         />
                         <TextField
                             onChange={(e) => setPassword(e.target.value)}
@@ -146,8 +148,6 @@ function LoginPage() {
                             id="password"
                             autoComplete="current-password"
                             variant="filled"
-                            error={incorrectPasswordError}
-                            helperText={incorrectPasswordError && "Incorrect password, please try again!"}
                         />
                         <FormControlLabel
                             onClick={handleCheckboxStatus}

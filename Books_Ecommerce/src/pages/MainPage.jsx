@@ -17,6 +17,12 @@ import { TextField } from '@mui/material';
 
 export default function MainPage() {
 
+  const PAGE_STATE = {
+    INITIAL_STATE: "INITIAL_STATE",
+    SEARCH_ERROR: "SEARCH_ERROR",
+    SEARCH_SUCCESS: "SEARCH_SUCCESS",
+  }
+
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -25,12 +31,12 @@ export default function MainPage() {
   const userLogged = useSelector(state => state.userLogged)
   const loginStatus = useSelector(state => state.loginStatus)
 
+  const [pageState, setPageState] = useState(PAGE_STATE.INITIAL_STATE)
   const [bookAdded, setBookAdded] = useState(false)
   const [booksFetched, setBooksFetched] = useState([])
   const [loading, setLoading] = useState(false)
   const [searchingData, setSearchingData] = useState("")
   const [booksSearched, setBooksSearched] = useState(null)
-  const [queryNotFound, setQueryNotFound] = useState(false)
 
   const unmatchedCartStored = localStorage.getItem("unmatchedCart") ?
     JSON.parse(localStorage.getItem("unmatchedCart")) : []
@@ -70,16 +76,20 @@ export default function MainPage() {
   }, [])
 
   const querySearch = () => {
-    setQueryNotFound(false)
-    fetch("http://localhost:5050/books/" + searchingData)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.length <= 0) {
-          setQueryNotFound(true)
-        } else {
-          setBooksSearched(data)
-        }
-      })
+    if (searchingData === "") {
+      setPageState(PAGE_STATE.SEARCH_ERROR)
+    } else {
+      fetch("http://localhost:5050/books/" + searchingData)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.length <= 0) {
+            setPageState(PAGE_STATE.SEARCH_ERROR)
+          } else {
+            setBooksSearched(data)
+            setPageState(PAGE_STATE.SEARCH_SUCCESS)
+          }
+        })
+    }
   }
 
   useEffect(() => {
@@ -236,7 +246,7 @@ export default function MainPage() {
         </div>
       }
 
-      {loading && !booksSearched ?
+      {pageState === PAGE_STATE.INITIAL_STATE && loading &&
         <>
           <Container fluid className="bg-light mt-3">
             <Row
@@ -259,9 +269,9 @@ export default function MainPage() {
                   Find your next <span className="fw-bold">favorite</span> generation of <span className="fw-bold">inpiring</span> people.
                 </Col>
                 <Col className="ms-2">
-                  <img src={booksFetched[0].coverImg} style={{ width: "125px", height: "180px" }} className="ms-2 mt-4" alt="" />
-                  <img src={booksFetched[1].coverImg} style={{ width: "125px", height: "180px" }} className="ms-2 mt-4" alt="" />
-                  <img src={booksFetched[2].coverImg} style={{ width: "125px", height: "180px" }} className="ms-2 mt-4" alt="" />
+                  <img src={booksFetched[0]?.coverImg} style={{ width: "125px", height: "180px" }} className="ms-2 mt-4" alt="" />
+                  <img src={booksFetched[1]?.coverImg} style={{ width: "125px", height: "180px" }} className="ms-2 mt-4" alt="" />
+                  <img src={booksFetched[2]?.coverImg} style={{ width: "125px", height: "180px" }} className="ms-2 mt-4" alt="" />
                 </Col>
               </div>
             </Row>
@@ -328,81 +338,80 @@ export default function MainPage() {
             </Row>
           </Container>
         </>
-        :
-        <>
-          {queryNotFound ?
-            <p
-              className="mt-4 ms-5 ps-5"
-              style={{
-                fontFamily: "Work Sans, sans-serif",
-                fontWeight: "500"
-              }}
-            >Your <span className="fw-bold">research</span> has found <span className="fw-bold">no matches!</span> Please try again!
-            </p>
-            :
-            <Container className="mt-1">
-              <Row className="justify-content-evenly pb-4">
-                {booksSearched?.map((book, index) =>
-                  <Col key={index} className="col-6 col-md-4 col-lg-3 my-3">
-                    <Card
-                      className="position-relative"
+      }
+
+      {pageState === PAGE_STATE.SEARCH_ERROR &&
+        <p
+          className="mt-4 ms-5 ps-5"
+          style={{
+            fontFamily: "Work Sans, sans-serif",
+            fontWeight: "500"
+          }}
+        >Your <span className="fw-bold">research</span> has found <span className="fw-bold">no matches!</span> Please try again!
+        </p>
+      }
+      {pageState === PAGE_STATE.SEARCH_SUCCESS &&
+        <Container className="mt-1">
+          <Row className="justify-content-evenly pb-4">
+            {booksSearched?.map((book, index) =>
+              <Col key={index} className="col-6 col-md-4 col-lg-3 my-3">
+                <Card
+                  className="position-relative"
+                  style={{
+                    height: "100%",
+                    backgroundColor: "#fcfcfc"
+                  }}
+                >
+                  <CardMedia
+                    image={book.coverImg}
+                    title={book.title}
+                    className="mt-3 mx-auto"
+                    style={{
+                      height: "180px",
+                      width: "120px"
+                    }}
+                  />
+                  <CardContent className="cardContent pb-1">
+                    <Typography
+                      className="lh-sm fw-bold"
+                      style={{ fontFamily: "Work Sans, sans-serif" }}
+                    >
+                      {book.title}
+                    </Typography>
+                    <Typography
+                      className="fw-light lh-sm mt-1"
+                      style={{ fontSize: "0.9rem", fontFamily: "Work Sans, sans-serif" }}
+                    >
+                      {book.author} - {book.publishedYear}
+                    </Typography>
+                    <Typography
+                      className="fw-normal lh-sm mt-3"
+                      style={{ fontSize: "0.9rem", fontFamily: "Work Sans, sans-serif" }}
+                    >
+                      {Number(book.price).toFixed(2)}$
+                    </Typography>
+                  </CardContent>
+                  <CardActions>
+                    <ButtonMui
+                      onClick={() => handleAddToCart(book)}
+                      className="buttonHover position-absolute bottom-0 end-0 mb-2 me-2"
+                      variant="outlined"
+                      size="small"
                       style={{
-                        height: "100%",
-                        backgroundColor: "#fcfcfc"
+                        fontFamily: "Work Sans, sans-serif",
+                        ...buttonColors,
+                        backgroundColor: "#f5fafb"
                       }}
                     >
-                      <CardMedia
-                        image={book.coverImg}
-                        title={book.title}
-                        className="mt-3 mx-auto"
-                        style={{
-                          height: "180px",
-                          width: "120px"
-                        }}
-                      />
-                      <CardContent className="cardContent pb-1">
-                        <Typography
-                          className="lh-sm fw-bold"
-                          style={{ fontFamily: "Work Sans, sans-serif" }}
-                        >
-                          {book.title}
-                        </Typography>
-                        <Typography
-                          className="fw-light lh-sm mt-1"
-                          style={{ fontSize: "0.9rem", fontFamily: "Work Sans, sans-serif" }}
-                        >
-                          {book.author} - {book.publishedYear}
-                        </Typography>
-                        <Typography
-                          className="fw-normal lh-sm mt-3"
-                          style={{ fontSize: "0.9rem", fontFamily: "Work Sans, sans-serif" }}
-                        >
-                          {Number(book.price).toFixed(2)}$
-                        </Typography>
-                      </CardContent>
-                      <CardActions>
-                        <ButtonMui
-                          onClick={() => handleAddToCart(book)}
-                          className="buttonHover position-absolute bottom-0 end-0 mb-2 me-2"
-                          variant="outlined"
-                          size="small"
-                          style={{
-                            fontFamily: "Work Sans, sans-serif",
-                            ...buttonColors,
-                            backgroundColor: "#f5fafb"
-                          }}
-                        >
-                          Add to Cart
-                        </ButtonMui>
-                      </CardActions>
-                    </Card>
-                  </Col>
-                )}
+                      Add to Cart
+                    </ButtonMui>
+                  </CardActions>
+                </Card>
+              </Col>
+            )}
 
-              </Row>
-            </Container>
-          }
-        </>
+          </Row>
+        </Container>
       }
     </>
   );
